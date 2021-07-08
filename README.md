@@ -1,2 +1,4 @@
-# invoicify
+# Invoicify
 Capstone project for CND 
+
+
