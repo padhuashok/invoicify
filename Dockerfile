@@ -3,6 +3,7 @@
 FROM openjdk:11.0-jdk-slim as builder
 VOLUME /tmp
 COPY . .
+RUN chmod +x gradlew
 RUN ./gradlew build
 
 # Phase 2 - Build container with runtime only to use .jar file within
