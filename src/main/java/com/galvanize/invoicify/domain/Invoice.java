@@ -3,8 +3,8 @@ package com.galvanize.invoicify.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+
+import javax.persistence.*;
 import java.util.List;
 
 @NoArgsConstructor
@@ -12,6 +12,9 @@ import java.util.List;
 @Setter
 @Entity
 public class Invoice {
+   @Id
+   @GeneratedValue(strategy = GenerationType.AUTO)
+   Long id;
    @OneToMany(mappedBy = "invoice")
-   private List<Item> items;
+   private List<InvoiceItem> invoiceItems;
 }

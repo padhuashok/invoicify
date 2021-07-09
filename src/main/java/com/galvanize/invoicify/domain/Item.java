@@ -4,8 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @NoArgsConstructor
@@ -13,12 +12,15 @@ import java.util.List;
 @Setter
 @Entity
 public class Item {
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Long id;
     private String description;
     private int quantity;
+    @OneToOne
     private Fee fee;
-    @OneToMany(mappedBy = "items")
-    private List<Invoice> invoices;
+    @OneToMany(mappedBy = "item")
+    private List<InvoiceItem> invoiceItems;
 
 
 
