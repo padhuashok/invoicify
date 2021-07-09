@@ -5,7 +5,7 @@ Items can be added for services rendered
 Invoice is sent to company for payment
 
 
-1. [Main Page](https://github.com/)
+1. [Main Page](https://github.com/padhuashok/invoicify/projects)
 2. Tools (to-do)
 3. Features (to-do)
 
