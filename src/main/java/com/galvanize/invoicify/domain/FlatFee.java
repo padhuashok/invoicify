@@ -13,4 +13,14 @@ import javax.persistence.Id;
 @Setter
 public class FlatFee extends Fee {
     private double amount;
+
+    public FlatFee(double amount) {
+        this.amount = amount;
+    }
+    public double getTotalFee(  ){
+        return amount;
+    }
+
+
+
 }

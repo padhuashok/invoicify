@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.util.List;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -20,10 +19,18 @@ public class Item {
     private int quantity;
     @OneToOne
     private Fee fee;
+
     @OneToMany(mappedBy = "item")
     private List<InvoiceItem> invoiceItems;
 
 
+    public Item(String dev_items,  Fee fee) {
+        this.description=dev_items;
+        this.fee=fee;
+    }
 
+    public double getFee(  ) {
 
+        return fee.getTotalFee();
+    }
 }

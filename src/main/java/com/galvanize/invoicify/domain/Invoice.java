@@ -17,4 +17,16 @@ public class Invoice {
    Long id;
    @OneToMany(mappedBy = "invoice")
    private List<InvoiceItem> invoiceItems;
+
+   private double invoiceTotal;
+
+   public double calculateInvoiceTotal(){
+      double temp=0;
+      for(InvoiceItem invoiceitem : invoiceItems){
+
+         invoiceTotal+=invoiceitem.getItem().getFee();
+
+      }
+   return invoiceTotal;
+   }
 }

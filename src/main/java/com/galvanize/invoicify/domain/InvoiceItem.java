@@ -1,5 +1,8 @@
 package com.galvanize.invoicify.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
@@ -17,6 +20,8 @@ public class InvoiceItem {
     @JoinColumn(name="invoiceId")
     private Invoice invoice;
 
-
-
+    public InvoiceItem(Item item, Invoice invoice) {
+        this.item = item;
+        this.invoice = invoice;
+    }
 }

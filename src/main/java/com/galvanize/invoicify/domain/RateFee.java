@@ -14,4 +14,15 @@ import javax.persistence.Id;
 public class RateFee extends Fee {
     private double rate;
     private int quantity;
+
+
+    public RateFee(double rate, int quantity) {
+        this.rate = rate;
+        this.quantity = quantity;
+    }
+
+    public double getTotalRateFee(  ){
+        return quantity*rate;
+    }
+
 }
