@@ -26,3 +26,9 @@ Invoicyfy has detailed indepth documentation of all endpoints usedin project
 It supports Docker profile to run in different environments. 
 
 It runs in a containerized enviroment and used Postgres as DB. 
+
+##**Build Section**
+
+Before starting the build, Copy dos2unix file to root folder 
+once copied, issue following command
+dos2unix gradlew
