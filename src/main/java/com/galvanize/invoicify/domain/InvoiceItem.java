@@ -3,6 +3,9 @@ package com.galvanize.invoicify.domain;
 import javax.persistence.*;
 
 @Entity
+@Getter
+@Setter
+
 public class InvoiceItem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -13,4 +16,7 @@ public class InvoiceItem {
     @ManyToOne
     @JoinColumn(name="invoiceId")
     private Invoice invoice;
+
+
+
 }

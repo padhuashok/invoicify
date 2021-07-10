@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -21,6 +22,7 @@ public class Item {
     private Fee fee;
     @OneToMany(mappedBy = "item")
     private List<InvoiceItem> invoiceItems;
+
 
 
 
