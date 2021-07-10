@@ -36,4 +36,8 @@ public class CompanyService {
         company.setContactPhoneNumber(companyDTO.getContactPhoneNumber());
         return companyRepository.save(company);
     }
+
+    public Company add(Company company) {
+        return companyRepository.save(company);
+    }
 }

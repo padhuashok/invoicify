@@ -17,15 +17,15 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     @NotNull
-    private String name;
+    public String name;
     @NotNull
-    private String address;
+    public String address;
     @NotNull
-    private String contactName;
+    public String contactName;
     @NotNull
-    private String contactTitle;
+    public String contactTitle;
     @NotNull
-    private String contactPhoneNumber;
+    public String contactPhoneNumber;
 
     @OneToMany(mappedBy = "company")
     private List<Invoice> invoices;
