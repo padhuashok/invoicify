@@ -3,11 +3,14 @@ package com.galvanize.invoicify.controller;
 import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.service.CompanyService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
+@Validated
 public class CompanyController {
 
 
@@ -25,13 +28,16 @@ public class CompanyController {
 //    }
 
     @PostMapping("/company")
-    public Company createCompany(@RequestBody CompanyDTO companyDTO){
+    public Company createCompany(@RequestBody @Valid CompanyDTO companyDTO)
+    {
+
         return companyService.save(companyDTO);
     }
 
 
     @PutMapping("/company")
-    public Company getnnnnCompany(@RequestBody CompanyDTO companyDTO){
+    public Company getCompany(@RequestBody CompanyDTO companyDTO)
+    {
         return companyService.save(companyDTO);
     }
 
