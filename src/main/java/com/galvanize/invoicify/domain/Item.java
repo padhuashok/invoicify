@@ -14,7 +14,7 @@ import java.util.List;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private long id;
     private String description;
     private int quantity;
     @OneToOne

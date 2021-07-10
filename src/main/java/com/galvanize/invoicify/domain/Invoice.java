@@ -14,7 +14,11 @@ import java.util.List;
 public class Invoice {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
-   Long id;
+   private long id;
    @OneToMany(mappedBy = "invoice")
    private List<InvoiceItem> invoiceItems;
+   @ManyToOne
+   @JoinColumn(name="companyId")
+   private Company company;
+
 }
