@@ -23,7 +23,7 @@ The following is a list of tools associated with the project .
 
 Invoicyfy has detailed indepth documentation of all endpoints usedin project
 
-It supports Docker profile to run in different environments. 
+It supports Docker profile to run in different environments.
 
 It runs in a containerized enviroment and used Postgres as DB. 
 
