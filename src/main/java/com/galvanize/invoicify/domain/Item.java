@@ -17,20 +17,14 @@ public class Item {
     Long id;
     private String description;
     private int quantity;
-    @OneToOne
-    private Fee fee;
+    private double totalFee;
 
     @OneToMany(mappedBy = "item")
     private List<InvoiceItem> invoiceItems;
 
-
-    public Item(String dev_items,  Fee fee) {
-        this.description=dev_items;
-        this.fee=fee;
-    }
-
-    public double getFee(  ) {
-
-        return fee.getTotalFee();
+    public Item(String description, int quantity, double totalFee) {
+        this.description = description;
+        this.quantity = quantity;
+        this.totalFee = totalFee;
     }
 }

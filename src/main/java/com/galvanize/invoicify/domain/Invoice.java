@@ -24,7 +24,7 @@ public class Invoice {
       double temp=0;
       for(InvoiceItem invoiceitem : invoiceItems){
 
-         invoiceTotal+=invoiceitem.getItem().getFee();
+         invoiceTotal+=invoiceitem.getItem().getTotalFee()* invoiceitem.getItem().getQuantity() ;
 
       }
    return invoiceTotal;

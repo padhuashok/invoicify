@@ -1,5 +1,8 @@
+package com.galvanize.invoicify.service;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.invoicify.domain.*;
+import com.galvanize.invoicify.service.InvoiceItemService;
 import com.galvanize.invoicify.service.InvoiceService;
 import com.galvanize.invoicify.service.ItemService;
 import org.junit.jupiter.api.Test;
@@ -15,7 +18,7 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 
 @WebMvcTest
-public class APITests {
+public class ApiTests {
     @Autowired
     private MockMvc mvc;
 
@@ -28,28 +31,33 @@ public class APITests {
     @MockBean
     ItemService itemservice;
 
+    @MockBean
+    InvoiceItemService invoiceItemService;
+
     @Test
     void addItemtoInvoice() throws Exception{
         Invoice invoice= new Invoice();
         List<InvoiceItem> invoiceItems= new ArrayList<InvoiceItem>();
-
-        Item myitem=new Item("Dev Items",  new FlatFee(20.0));
+        Item myitem=new Item("Dev Items",5,20.5);
         //myitem.setTotalFee();
 //        invoiceItems.add(myitem);
-        Item myitemNext = new Item("Dev more Items",  new RateFee(2d,10));
+        Item myitemNext = new Item("Dev Items More",10,20.5);
+        InvoiceItem invoiceItem=new InvoiceItem(myitem,invoice);
+
         invoiceItems.add( new InvoiceItem(myitem, invoice));
 
 
         //call service to save invoice
         when(invoiceService.saveInvoice(invoice)).thenReturn(invoice);
         //call service to save item
-        when(itemservice.saveInvoice(invoice)).thenReturn(invoice);
+        when(itemservice.saveItem(myitem)).thenReturn(myitem);
 
         //call service to save invoiceItem
 
-        when(service.saveInvoice(invoice)).thenReturn(invoice);
+       // when(invoiceItemService.saveInvoiceItem(invoiceItem)).thenReturn(invoiceItem);
 
         //create request to call api to create and check result
+
 
 
 
