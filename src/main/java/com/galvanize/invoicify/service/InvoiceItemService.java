@@ -14,7 +14,7 @@ import java.util.List;
 public class InvoiceItemService {
     @Autowired
     InvoiceItemRepository invoicItemRepository;
-    public void saveInvoiceItem(List<Item> items, Invoice invoice) {
+    public List<InvoiceItem> saveInvoiceItem(List<Item> items, Invoice invoice) {
         List<InvoiceItem> invoiceItems = new ArrayList<>();
         items.forEach( item -> {
             InvoiceItem invoiceItem = new InvoiceItem(item, invoice);
@@ -22,6 +22,6 @@ public class InvoiceItemService {
                 }
         );
 
-        invoicItemRepository.saveAll(invoiceItems);
+        return invoicItemRepository.saveAll(invoiceItems);
     }
 }

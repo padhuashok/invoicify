@@ -1,6 +1,7 @@
 package com.galvanize.invoicify.domain;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -8,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @Setter
-
+@NoArgsConstructor
 public class InvoiceItem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

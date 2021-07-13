@@ -39,14 +39,9 @@ public class ApiTests {
         Invoice invoice= new Invoice();
         List<InvoiceItem> invoiceItems= new ArrayList<InvoiceItem>();
         Item myitem=new Item("Dev Items",5,20.5);
-        //myitem.setTotalFee();
-//        invoiceItems.add(myitem);
-        Item myitemNext = new Item("Dev Items More",10,20.5);
+        Item myitemNext = new Item("Dev Items More",2,20.5);
         InvoiceItem invoiceItem=new InvoiceItem(myitem,invoice);
-
         invoiceItems.add( new InvoiceItem(myitem, invoice));
-
-
         //call service to save invoice
         when(invoiceService.saveInvoice(invoice)).thenReturn(invoice);
         //call service to save item

@@ -20,6 +20,7 @@ public class Invoice {
 
    private double invoiceTotal;
 
+
    public double calculateInvoiceTotal(){
       double temp=0;
       for(InvoiceItem invoiceitem : invoiceItems){

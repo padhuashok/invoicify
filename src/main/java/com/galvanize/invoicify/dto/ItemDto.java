@@ -15,8 +15,20 @@ public class ItemDto {
     private String description;
     private int quantity;
     private Fee fee;
+    private boolean isFlatFee;
+    private double rateFee;
+    private int quantityFee;
+    private double amountFlatFee;
 
     public double getFee() {
         return fee.getTotalFee();
+    }
+
+    public boolean getIsFlatFee() {
+        return isFlatFee;
+    }
+
+    public void setIsFlatFee(boolean flatFee) {
+        isFlatFee = flatFee;
     }
 }

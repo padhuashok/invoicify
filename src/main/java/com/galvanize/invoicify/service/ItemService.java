@@ -1,6 +1,8 @@
 package com.galvanize.invoicify.service;
 
+import com.galvanize.invoicify.domain.FlatFee;
 import com.galvanize.invoicify.domain.Item;
+import com.galvanize.invoicify.domain.RateFee;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,12 @@ public class ItemService {
     public List<Item> saveItems(List<ItemDto> items) {
         List<Item> itemList=items.stream().map(e ->{
             Item item= new Item();
+            if(e.getIsFlatFee()) {
+                e.setFee(new FlatFee(e.getAmountFlatFee()));
+            }
+            else{
+                e.setFee(new RateFee(e.getRateFee(), e.getQuantityFee()));
+            }
             item.setQuantity(e.getQuantity());
             item.setTotalFee(e.getFee());
             item.setDescription(e.getDescription());

@@ -21,7 +21,7 @@ public class RateFee extends Fee {
         this.quantity = quantity;
     }
 
-    public double getTotalRateFee(  ){
+    public double getTotalFee(  ){
         return quantity*rate;
     }
 
