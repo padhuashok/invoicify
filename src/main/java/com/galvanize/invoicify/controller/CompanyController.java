@@ -36,10 +36,10 @@ public class CompanyController {
     public ResponseEntity<GeneralResponse<Company>> createCompany(@RequestBody @Valid CompanyDTO companyDTO)
     {
 
-       // if(companyDTO.getContactPhoneNumber().contains("[0-9]*"))
+       if(companyDTO.getContactPhoneNumber().matches("\\d{10}"))
         return RestUtils.buildResponse(companyService.save(companyDTO));
-//        else
-//            return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, "ContactPhoneNumber should be Numeric", null);
+        else
+          return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, "ContactPhoneNumber should be 10 digit with numeric values", null);
     }
 
     @PutMapping("/company")
