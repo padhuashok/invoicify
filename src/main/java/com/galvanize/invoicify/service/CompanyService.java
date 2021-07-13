@@ -5,15 +5,13 @@ import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class CompanyService {
 
     private CompanyRepository companyRepository;
 
-    public CompanyService(CompanyRepository companyRepository) {
+    public CompanyService(CompanyRepository companyRepository)
+    {
         this.companyRepository = companyRepository;
     }
 //    public List<CompanyDTO> getCompany(){
@@ -40,4 +38,5 @@ public class CompanyService {
     public Company add(Company company) {
         return companyRepository.save(company);
     }
-}
+
+  }

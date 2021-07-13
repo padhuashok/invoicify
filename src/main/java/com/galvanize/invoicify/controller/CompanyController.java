@@ -2,7 +2,9 @@ package com.galvanize.invoicify.controller;
 
 import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.dto.CompanyDTO;
+import com.galvanize.invoicify.response.GeneralResponse;
 import com.galvanize.invoicify.service.CompanyService;
+import com.galvanize.invoicify.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -31,18 +33,18 @@ public class CompanyController {
 //    }
 
     @PostMapping("/company")
-    public Company createCompany(@RequestBody @Valid CompanyDTO companyDTO)
+    public ResponseEntity<GeneralResponse<Company>> createCompany(@RequestBody @Valid CompanyDTO companyDTO)
     {
 
-        return companyService.save(companyDTO);
+       // if(companyDTO.getContactPhoneNumber().contains("[0-9]*"))
+        return RestUtils.buildResponse(companyService.save(companyDTO));
+//        else
+//            return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, "ContactPhoneNumber should be Numeric", null);
     }
-
 
     @PutMapping("/company")
     public Company getCompany(@RequestBody CompanyDTO companyDTO)
     {
         return companyService.save(companyDTO);
     }
-
-
 }
