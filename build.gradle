@@ -41,6 +41,19 @@ test {
 }
 
 asciidoctor {
+	sourceDir "src/docs/asciidoc"
 	inputs.dir snippetsDir
+	attributes 'snippets': snippetsDir
 	dependsOn test
+}
+
+asciidoctor.doLast {
+	copy {
+		from 'build/asciidoc/html5'
+		into 'build/resources/main/static'
+		include 'index.html'
+	}
+}
+bootJar {
+	dependsOn asciidoctor
 }
