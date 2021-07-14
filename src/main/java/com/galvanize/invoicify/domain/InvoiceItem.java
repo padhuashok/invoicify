@@ -20,9 +20,10 @@ public class InvoiceItem {
     @ManyToOne
     @JoinColumn(name="invoiceId")
     private Invoice invoice;
-
     public InvoiceItem(Item item, Invoice invoice) {
         this.item = item;
         this.invoice = invoice;
     }
+
+
 }

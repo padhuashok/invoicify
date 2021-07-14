@@ -18,7 +18,6 @@ public class Item {
     private String description;
     private int quantity;
     private double totalFee;
-
     @OneToMany(mappedBy = "item")
     private List<InvoiceItem> invoiceItems;
 

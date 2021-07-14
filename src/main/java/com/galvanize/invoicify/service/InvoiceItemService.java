@@ -21,7 +21,6 @@ public class InvoiceItemService {
             invoiceItems.add(invoiceItem);
                 }
         );
-
         return invoicItemRepository.saveAll(invoiceItems);
     }
 }

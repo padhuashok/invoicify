@@ -43,7 +43,7 @@ public class InvoicifyController {
        invoiceService.saveInvoice(invoice);
        return new ResponseEntity<List<InvoiceItem>>(invoiceItemService.saveInvoiceItem(items, invoice), HttpStatus.CREATED);
 
-
     }
+
 
 }
