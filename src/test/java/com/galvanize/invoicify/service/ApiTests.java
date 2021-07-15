@@ -70,7 +70,7 @@ public class ApiTests {
         invoiceItemList.add(invoiceItem);
         invoiceItemList.add(invoiceItem2);
         when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
-        mvc.perform(post("/invoice")
+        mvc.perform(post("/invoice/items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(InvoicifyStringUtils.asJsonString(dtoitems)))
                 .andExpect(status().isCreated())

@@ -34,7 +34,7 @@ public class InvoicifyController {
         return "Hello Alpha Team";
     }
 
-    @PostMapping("/invoice")
+    @PostMapping("/invoice/items")
     public ResponseEntity<List<InvoiceItem>> addItemToInvoice(@RequestBody List<ItemDto> itemDtos) {
 
         List<Item> items = itemService.saveItems(itemDtos);

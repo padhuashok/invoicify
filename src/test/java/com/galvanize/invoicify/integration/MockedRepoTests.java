@@ -67,7 +67,7 @@ public class MockedRepoTests{
         when(itemRepository.saveAll(anyList())).thenReturn(itemList);
         when(invoiceRepository.save(isA(Invoice.class))).thenReturn(invoice);
         when(invoiceItemRepository.saveAll(anyList())).thenReturn(invoiceItemList);
-        mvc.perform(post("/invoice")
+        mvc.perform(post("/invoice/items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(InvoicifyStringUtils.asJsonString(dtoitems)))
                 .andExpect(status().isCreated())
