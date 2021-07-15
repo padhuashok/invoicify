@@ -26,10 +26,17 @@ public class CompanyController {
     }
 
 //    @GetMapping("/company")
-//    public List<CompanyDTO> getCompany()
+//    public ResponseEntity<GeneralResponse<Company>> getCompany()
 //    {
-//        return this.companyService.getCompany();
+//        return RestUtils.buildResponse(companyService.getCompany());
 //    }
+
+
+    @GetMapping("/company")
+    public ResponseEntity<Iterable<Company>> getCompany(){
+        return new ResponseEntity(companyService.getCompany(), HttpStatus.OK);
+    }
+
 
     @PostMapping("/company")
     public ResponseEntity<GeneralResponse<Company>> createCompany(@Valid @RequestBody CompanyDTO companyDTO)
