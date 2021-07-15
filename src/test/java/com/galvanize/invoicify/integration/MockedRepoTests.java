@@ -22,11 +22,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -42,30 +45,47 @@ public class MockedRepoTests{
     @MockBean
     InvoiceRepository invoiceRepository;
     @Test
-    public void addItemToInvoice() throws Exception{
-        Invoice invoice=new Invoice();
-        invoice.setInvoiceTotal(250);
-        Item item1 = new Item("DevItems",5,25);
-        Item item2 = new Item("Dev Items More", 2, 10);
-        InvoiceItem invoiceItem1=new InvoiceItem(item1,invoice);
-        InvoiceItem invoiceItem2=new InvoiceItem(item2,invoice);
-        List<Item> itemList =  Arrays.asList(item1,item2);
-        List<InvoiceItem> invoiceItems=new ArrayList<>();
-        when(invoiceRepository.save(invoice)).thenReturn(invoice);
-        when(itemRepository.saveAll(itemList)).thenReturn(itemList);
-        when(invoiceItemRepository.saveAll(invoiceItems)).thenReturn(invoiceItems);
+    public void addItemToInvoice() throws Exception {
+        ItemDto itemdto1 = new ItemDto("Dev Items", 5, true, 2.3);
+        ItemDto itemdto2 = new ItemDto("Dev Items More", 2, false, 2.3, 10);
+        //create request to call api to create and check result
+        List<ItemDto> dtoitems = new ArrayList<>();
+        dtoitems.add(itemdto1);
+        dtoitems.add(itemdto2);
+        Item item1 = new Item(itemdto1);
+        Item item2 = new Item(itemdto2);
+        List<Item> itemList = Arrays.asList(item1, item2);
+        Invoice invoice = new Invoice();
+        invoice.setId(1L);
+        item1.setId(1L);
+        item2.setId(2L);
+        List<InvoiceItem> invoiceItemList = new ArrayList<>();
+        InvoiceItem invoiceItem = new InvoiceItem(item1, invoice);
+        InvoiceItem invoiceItem2 = new InvoiceItem(item2, invoice);
+        invoiceItemList.add(invoiceItem);
+        invoiceItemList.add(invoiceItem2);
+        when(itemRepository.saveAll(anyList())).thenReturn(itemList);
+        when(invoiceRepository.save(isA(Invoice.class))).thenReturn(invoice);
+        when(invoiceItemRepository.saveAll(anyList())).thenReturn(invoiceItemList);
         mvc.perform(post("/invoice")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(InvoicifyStringUtils.asJsonString(invoiceItems)))
-                .andExpect(status().isCreated()).andDo((document("Add Items to Invoice POST", responseFields(
-                fieldWithPath("[]").description("One or more line invoiceItems of invoice"),
-                fieldWithPath("[].id").description("Internal ID of Items"),
-                fieldWithPath("[].description").description("Description of line item for invoice"),
-                fieldWithPath("[].quantity").description("Number of persons involved for the work"),
-                fieldWithPath("[].isFlatFee").description("Identifies the type of cost ( flat/rate based)"),
-                fieldWithPath("[].amountFlatFee").description("Flat fee Amount charged for an item "),
-                fieldWithPath("[].rateFee").description("Rate per person involved in the work "),
-                fieldWithPath("[].quantityFee").description("Amount for each person involved")))));
+                .content(InvoicifyStringUtils.asJsonString(dtoitems)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("[0].item").value(invoiceItemList.get(0).getItem()))
+                .andExpect(jsonPath("[0].invoice").value(invoiceItemList.get(0).getInvoice()))
+                .andExpect(jsonPath("[1].item").value(invoiceItemList.get(1).getItem()))
+                .andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()))
+                .andDo((document("Add Items to Invoice POST", responseFields(
+                        fieldWithPath("[]").description("One or more line items of invoice"),
+                        fieldWithPath("[].id").description("Invoice Item ID"),
+                        fieldWithPath("[].item.id").description("Internal ID of Items"),
+                        fieldWithPath("[].item.description").description("Description of line item for invoice"),
+                        fieldWithPath("[].item.quantity").description("Number of persons involved for the work"),
+                        fieldWithPath("[].item.totalFee").description("Identifies the type of cost ( flat/rate based)"),
+                        fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
+                        fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
+                        fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
     }
 
 }

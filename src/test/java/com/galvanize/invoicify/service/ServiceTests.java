@@ -41,9 +41,7 @@ public class ServiceTests {
         Item item1 = new Item(itemdto1);
         Item item2 = new Item(itemdto2);
         List<Item> itemList = Arrays.asList(item1, item2);
-        when(itemservice.saveItems(anyList())).thenReturn(itemList);
         Invoice invoice = new Invoice();
-        when(invoiceService.saveInvoice(isA(Invoice.class))).thenReturn(invoice);
         invoice.setId(1L);
         item1.setId(1L);
         item2.setId(2L);

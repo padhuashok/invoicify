@@ -5,6 +5,7 @@ import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.utils.InvoicifyStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -71,7 +72,7 @@ public class ApiTests {
         when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
         mvc.perform(post("/invoice")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(dtoitems)))
+                .content(InvoicifyStringUtils.asJsonString(dtoitems)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("[0].item").value(invoiceItemList.get(0).getItem()))
                 .andExpect(jsonPath("[0].invoice").value(invoiceItemList.get(0).getInvoice()))
@@ -89,12 +90,4 @@ public class ApiTests {
                 fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
                 fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
     }
-    static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }
