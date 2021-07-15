@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.OneToOne;
+import java.util.Objects;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -46,6 +48,19 @@ public class ItemDto {
         return isFlatFee;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ItemDto itemDto = (ItemDto) o;
+        return quantity == itemDto.quantity && isFlatFee == itemDto.isFlatFee && Double.compare(itemDto.rateFee, rateFee) == 0 && quantityFee == itemDto.quantityFee && Double.compare(itemDto.amountFlatFee, amountFlatFee) == 0 && description.equals(itemDto.description) && fee.equals(itemDto.fee);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, quantity, fee, isFlatFee, rateFee, quantityFee, amountFlatFee);
+    }
+
     public void setIsFlatFee(boolean flatFee) {
         isFlatFee = flatFee;
     }
@@ -62,4 +77,5 @@ public class ItemDto {
                 ", amountFlatFee=" + amountFlatFee +
                 '}';
     }
+
 }

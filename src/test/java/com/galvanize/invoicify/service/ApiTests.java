@@ -1,10 +1,9 @@
 package com.galvanize.invoicify.service;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.galvanize.invoicify.domain.*;
+import com.galvanize.invoicify.domain.Invoice;
+import com.galvanize.invoicify.domain.InvoiceItem;
+import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.ItemDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doAnswer;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -61,9 +61,9 @@ public class ApiTests {
         Item item1=new Item(itemdto1);
         Item item2=new Item(itemdto2);
         List<Item> itemList= Arrays.asList(item1,item2);
-        when(itemservice.saveItems(dtoitems)).thenReturn(itemList);
+        when(itemservice.saveItems(anyList())).thenReturn(itemList);
         Invoice invoice=new Invoice();
-        when(invoiceService.saveInvoice(invoice)).thenReturn(invoice);
+        when(invoiceService.saveInvoice(isA(Invoice.class))).thenReturn(invoice);
         invoice.setId(1L);
         item1.setId(1L);
         item2.setId(2L);
@@ -72,7 +72,7 @@ public class ApiTests {
         InvoiceItem invoiceItem2=new InvoiceItem(item2,invoice);
         invoiceItemList.add(invoiceItem);
         invoiceItemList.add(invoiceItem2);
-        when(invoiceItemService.saveInvoiceItem(itemList,invoice)).thenReturn(invoiceItemList);
+        when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
 //        doAnswer(invocation -> {
 //            List<Item> items = invocation.getArgument(0);
 //            Invoice invoice2=invocation.getArgument(1);
@@ -96,10 +96,10 @@ public class ApiTests {
                 fieldWithPath("[].item.id").description("Internal ID of Items"),
                 fieldWithPath("[].item.description").description("Description of line item for invoice"),
                 fieldWithPath("[].item.quantity").description("Number of persons involved for the work"),
-//                fieldWithPath("[].item.totalFee").description("Identifies the type of cost ( flat/rate based)"),
-//                fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
-//                fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
-//                fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
+                fieldWithPath("[].item.totalFee").description("Identifies the type of cost ( flat/rate based)"),
+                fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
+                fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
+                fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
                 fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
     }
     static String asJsonString(final Object obj) {
