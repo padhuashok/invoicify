@@ -21,17 +21,8 @@ public class ItemService {
 
     public List<Item> saveItems(List<ItemDto> items) {
         List<Item> itemList=items.stream().map(e ->{
-            Item item= new Item();
-            if(e.getIsFlatFee()) {
-                e.setFee(new FlatFee(e.getAmountFlatFee()));
-            }
-            else{
-                e.setFee(new RateFee(e.getRateFee(), e.getQuantityFee()));
-            }
-            item.setQuantity(e.getQuantity());
-            item.setTotalFee(e.getFee());
-            item.setDescription(e.getDescription());
-            return item;
+            return new Item(e);
+
         })
                 .collect(Collectors.toList());
         return itemRepository.saveAll(itemList);

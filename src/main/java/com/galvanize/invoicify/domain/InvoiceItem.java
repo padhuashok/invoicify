@@ -25,5 +25,12 @@ public class InvoiceItem {
         this.invoice = invoice;
     }
 
-
+    @Override
+    public String toString() {
+        return "InvoiceItem{" +
+                "id=" + id +
+                ", item=" + item +
+                ", invoice=" + invoice +
+                '}';
+    }
 }

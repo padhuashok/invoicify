@@ -37,11 +37,15 @@ public class InvoicifyController {
     @PostMapping("/invoice")
     public ResponseEntity<List<InvoiceItem>> addItemToInvoice(@RequestBody List<ItemDto> itemDtos){
 
-
+        System.out.println(itemDtos);
        List<Item> items = itemService.saveItems(itemDtos);
+        System.out.println(items);
        Invoice invoice = new Invoice();
-       invoiceService.saveInvoice(invoice);
-       return new ResponseEntity<List<InvoiceItem>>(invoiceItemService.saveInvoiceItem(items, invoice), HttpStatus.CREATED);
+       invoice=invoiceService.saveInvoice(invoice);
+        System.out.println(invoice);
+       List<InvoiceItem> invoiceItems=invoiceItemService.saveInvoiceItem(items, invoice);
+        System.out.println(invoiceItems);
+       return new ResponseEntity<List<InvoiceItem>>(invoiceItems, HttpStatus.CREATED);
 
     }
 

@@ -1,5 +1,6 @@
 package com.galvanize.invoicify.domain;
 
+import com.galvanize.invoicify.dto.ItemDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,6 +26,19 @@ public class Item {
         this.description = description;
         this.quantity = quantity;
         this.totalFee = totalFee;
+    }
+    public Item(ItemDto e){
+
+        if(e.getIsFlatFee()) {
+            e.setFee(new FlatFee(e.getAmountFlatFee()));
+        }
+        else{
+            e.setFee(new RateFee(e.getRateFee(), e.getQuantityFee()));
+        }
+        this.setQuantity(e.getQuantity());
+        this.setTotalFee(e.getFee());
+        this.setDescription(e.getDescription());
+
     }
 
 }

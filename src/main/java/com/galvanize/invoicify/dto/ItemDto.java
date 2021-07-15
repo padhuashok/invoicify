@@ -49,4 +49,17 @@ public class ItemDto {
     public void setIsFlatFee(boolean flatFee) {
         isFlatFee = flatFee;
     }
+
+    @Override
+    public String toString() {
+        return "ItemDto{" +
+                "description='" + description + '\'' +
+                ", quantity=" + quantity +
+                ", fee=" + fee +
+                ", isFlatFee=" + isFlatFee +
+                ", rateFee=" + rateFee +
+                ", quantityFee=" + quantityFee +
+                ", amountFlatFee=" + amountFlatFee +
+                '}';
+    }
 }
