@@ -1,5 +1,6 @@
 package com.galvanize.invoicify.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@EqualsAndHashCode
 public class Invoice {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)

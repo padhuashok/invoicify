@@ -13,22 +13,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doAnswer;
-
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest
@@ -73,24 +69,15 @@ public class ApiTests {
         invoiceItemList.add(invoiceItem);
         invoiceItemList.add(invoiceItem2);
         when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
-//        doAnswer(invocation -> {
-//            List<Item> items = invocation.getArgument(0);
-//            Invoice invoice2=invocation.getArgument(1);
-//            List<InvoiceItem> invoiceItems = new ArrayList<>();
-//            AtomicLong id=new AtomicLong(1L);
-//            items.forEach( item -> {
-//                        InvoiceItem invoiceItem = new InvoiceItem(item, invoice);
-//                        invoiceItems.add(invoiceItem);
-//                        invoiceItem.setId(id.getAndIncrement());
-//                    }
-//            );
-//            return invoiceItems;
-//        }).when(invoiceItemService).saveInvoiceItem(anyList(),isA(Invoice.class));
         mvc.perform(post("/invoice")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(dtoitems)))
-                .andExpect(status().isCreated()).
-                andDo((document("Add Items to Invoice POST", responseFields(
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("[0].item").value(invoiceItemList.get(0).getItem()))
+                .andExpect(jsonPath("[0].invoice").value(invoiceItemList.get(0).getInvoice()))
+                .andExpect(jsonPath("[1].item").value(invoiceItemList.get(1).getItem()))
+                .andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()))
+                .andDo((document("Add Items to Invoice POST", responseFields(
                 fieldWithPath("[]").description("One or more line items of invoice"),
                 fieldWithPath("[].id").description("Invoice Item ID"),
                 fieldWithPath("[].item.id").description("Internal ID of Items"),

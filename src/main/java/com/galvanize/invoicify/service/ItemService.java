@@ -22,7 +22,6 @@ public class ItemService {
     public List<Item> saveItems(List<ItemDto> items) {
         List<Item> itemList=items.stream().map(e ->{
             return new Item(e);
-
         })
                 .collect(Collectors.toList());
         return itemRepository.saveAll(itemList);

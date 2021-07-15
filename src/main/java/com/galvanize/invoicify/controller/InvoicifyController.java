@@ -30,22 +30,18 @@ public class InvoicifyController {
     }
 
     @GetMapping(value = "/healthcheck")
-    public String healthCheck(){
+    public String healthCheck() {
         return "Hello Alpha Team";
     }
 
     @PostMapping("/invoice")
-    public ResponseEntity<List<InvoiceItem>> addItemToInvoice(@RequestBody List<ItemDto> itemDtos){
+    public ResponseEntity<List<InvoiceItem>> addItemToInvoice(@RequestBody List<ItemDto> itemDtos) {
 
-        System.out.println(itemDtos);
-       List<Item> items = itemService.saveItems(itemDtos);
-        System.out.println(items);
-       Invoice invoice = new Invoice();
-       invoice=invoiceService.saveInvoice(invoice);
-        System.out.println(invoice);
-       List<InvoiceItem> invoiceItems=invoiceItemService.saveInvoiceItem(items, invoice);
-        System.out.println(invoiceItems);
-       return new ResponseEntity<List<InvoiceItem>>(invoiceItems, HttpStatus.CREATED);
+        List<Item> items = itemService.saveItems(itemDtos);
+        Invoice invoice = new Invoice();
+        invoice = invoiceService.saveInvoice(invoice);
+        List<InvoiceItem> invoiceItems = invoiceItemService.saveInvoiceItem(items, invoice);
+        return new ResponseEntity<List<InvoiceItem>>(invoiceItems, HttpStatus.CREATED);
 
     }
 

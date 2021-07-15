@@ -9,8 +9,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
 
 @WebMvcTest
@@ -28,32 +32,36 @@ public class ServiceTests {
     InvoiceItemService invoiceItemService;
     @Test
     void addItemtoInvoice() throws Exception {
-        Invoice invoice = new Invoice();
-        List<InvoiceItem> invoiceItems = new ArrayList<InvoiceItem>();
         ItemDto itemdto1 = new ItemDto("Dev Items", 5, true, 2.3);
         ItemDto itemdto2 = new ItemDto("Dev Items More", 2, false, 2.3, 10);
-        Item item1 = new Item();
-        Item item2 = new Item();
-        item1.setDescription(itemdto1.getDescription());
-        item1.setQuantity(itemdto1.getQuantity());
-        itemdto1.setFee(new FlatFee(itemdto1.getAmountFlatFee()));
-        item1.setTotalFee(itemdto1.getFee());
-
-        item2.setDescription(itemdto1.getDescription());
-        item2.setQuantity(itemdto1.getQuantity());
-        itemdto2.setFee(new RateFee(itemdto2.getRateFee(), itemdto2.getQuantityFee()));
-        item2.setTotalFee(itemdto1.getFee());
-
-        List<Item> items = new ArrayList<>();
-        items.add(item1);
-        items.add(item2);
-
-        items.forEach(item -> {
-                    InvoiceItem invoiceItem = new InvoiceItem(item, invoice);
-                    invoiceItems.add(invoiceItem);
-                }
-        );
+        //create request to call api to create and check result
+        List<ItemDto> dtoitems = new ArrayList<>();
+        dtoitems.add(itemdto1);
+        dtoitems.add(itemdto2);
+        Item item1 = new Item(itemdto1);
+        Item item2 = new Item(itemdto2);
+        List<Item> itemList = Arrays.asList(item1, item2);
+        when(itemservice.saveItems(anyList())).thenReturn(itemList);
+        Invoice invoice = new Invoice();
+        when(invoiceService.saveInvoice(isA(Invoice.class))).thenReturn(invoice);
+        invoice.setId(1L);
+        item1.setId(1L);
+        item2.setId(2L);
+        List<InvoiceItem> invoiceItemList = new ArrayList<>();
+        InvoiceItem invoiceItem = new InvoiceItem(item1, invoice);
+        InvoiceItem invoiceItem2 = new InvoiceItem(item2, invoice);
+        invoiceItemList.add(invoiceItem);
+        invoiceItemList.add(invoiceItem2);
+        List<ItemDto> itemDtoList = Arrays.asList(itemdto1, itemdto2);
+        when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
+        List<Item> actualItems = itemservice.saveItems(itemDtoList);
+        assertEquals(itemList, actualItems);
+        when(invoiceService.saveInvoice(invoice)).thenReturn(invoice);
+        Invoice actualInvoice = invoiceService.saveInvoice(invoice);
+        assertEquals(invoice, actualInvoice);
         //call service to save invoiceInvoice
-        when(invoiceItemService.saveInvoiceItem(items, invoice)).thenReturn(invoiceItems);
+        when(invoiceItemService.saveInvoiceItem(itemList, invoice)).thenReturn(invoiceItemList);
+        List<InvoiceItem> actuals = invoiceItemService.saveInvoiceItem(itemList, invoice);
+        assertEquals(invoiceItemList, actuals);
     }
 }
