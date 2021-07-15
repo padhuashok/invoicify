@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @Validated
@@ -33,7 +32,7 @@ public class CompanyController {
 //    }
 
     @PostMapping("/company")
-    public ResponseEntity<GeneralResponse<Company>> createCompany(@RequestBody @Valid CompanyDTO companyDTO)
+    public ResponseEntity<GeneralResponse<Company>> createCompany(@Valid @RequestBody CompanyDTO companyDTO)
     {
 
        if(companyDTO.getContactPhoneNumber().matches("\\d{10}"))
@@ -43,8 +42,8 @@ public class CompanyController {
     }
 
     @PutMapping("/company")
-    public Company getCompany(@RequestBody CompanyDTO companyDTO)
+    public ResponseEntity<GeneralResponse<Company>> getCompany(@RequestBody CompanyDTO companyDTO)
     {
-        return companyService.save(companyDTO);
+        return RestUtils.buildResponse(companyService.save(companyDTO));
     }
 }

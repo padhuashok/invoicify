@@ -22,7 +22,7 @@ public class CompanyDTO {
     @NotNull
     private String contactTitle;
     @NotNull
-    @Pattern(regexp = "[0-9]*")
+    @Pattern(regexp = "[0-9]*", message = "ContactPhoneNumber should be 10 digit with numeric values")
     private String contactPhoneNumber;
 
 }
