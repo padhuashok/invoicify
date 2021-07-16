@@ -46,6 +46,10 @@ public class CompanyService {
 
         companyRepository.save(companyEntity);
     }
+
+    public Optional<Company> get(long id) {
+        return companyRepository.findById(id);
+    }
 /*
     public Optional<Company> updateCompanies(Company company, long id) {
         if (company.getName() == null && company.getContactName() == null) {

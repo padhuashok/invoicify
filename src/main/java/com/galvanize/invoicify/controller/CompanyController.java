@@ -11,6 +11,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @Validated
@@ -25,18 +27,16 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
-//    @GetMapping("/company")
-//    public ResponseEntity<GeneralResponse<Company>> getCompany()
-//    {
-//        return RestUtils.buildResponse(companyService.getCompany());
-//    }
-
-
     @GetMapping("/company")
-    public ResponseEntity<Iterable<Company>> getCompany(){
-        return new ResponseEntity(companyService.getCompany(), HttpStatus.OK);
+    public ResponseEntity<GeneralResponse<List<Company>>> getCompany()
+    {
+        return RestUtils.buildResponse(companyService.getCompany());
     }
 
+    @GetMapping("/company/{id}")
+    public Optional<Company> getById(@PathVariable(value = "id") long id) {
+        return companyService.get(id);
+    }
 
     @PostMapping("/company")
     public ResponseEntity<GeneralResponse<Company>> createCompany(@Valid @RequestBody CompanyDTO companyDTO)
