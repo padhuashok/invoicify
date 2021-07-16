@@ -18,20 +18,22 @@ public class Invoice {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
    Long id;
+   @Column(unique = true)
+   private int invoiceNumber;
    @OneToMany(mappedBy = "invoice")
    private List<InvoiceItem> invoiceItems;
    private double invoiceTotal;
    private String invoiceStatus;
    private LocalDate createdDate;
    private LocalDate modifiedDate;
+   @ManyToOne(mappedBy= "invoices")
+   private Company company;
 
    public double calculateInvoiceTotal(){
       double temp=0;
       for(InvoiceItem invoiceitem : invoiceItems){
-
          invoiceTotal+=invoiceitem.getItem().getTotalFee()* invoiceitem.getItem().getQuantity() ;
-
       }
-   return invoiceTotal;
+          return invoiceTotal;
    }
 }

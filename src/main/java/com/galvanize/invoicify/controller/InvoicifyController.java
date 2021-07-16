@@ -3,6 +3,7 @@ package com.galvanize.invoicify.controller;
 import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
+import com.galvanize.invoicify.dto.InvoiceDTO;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.service.InvoiceItemService;
 import com.galvanize.invoicify.service.InvoiceService;
@@ -40,10 +41,13 @@ public class InvoicifyController {
         return new ResponseEntity<List<InvoiceItem>>(invoiceItems, HttpStatus.CREATED);
     }
 
-//    @PostMapping("/invoice/{companyId}")
-//    public ResponseEntity<Invoice> createInvoice(@RequestBody Invoice invoice, @PathVariable String companyId){
-//
-//    }
+    @PostMapping("/invoice")
+    public ResponseEntity<Invoice> createInvoice(@RequestBody InvoiceDTO invoiceDTO){
+        List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList());
+        //call company service to check if comapny exists and then call invoice service
+        Company c = companyService.getCompany(invoiceDTO.getCompanyId());
+        invoiceService.calculateTotalCostAndSetStatus(invoiceItems);
+    }
 
 
 }
