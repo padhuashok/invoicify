@@ -35,7 +35,7 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-    public void updateCompany(CompanyDTO companyDTO) {
+    public Company updateCompany(CompanyDTO companyDTO) {
         Company companyEntity = companyRepository.findByName(companyDTO.getName());
 
         companyEntity.setName(companyDTO.getName());
@@ -44,20 +44,7 @@ public class CompanyService {
         companyEntity.setContactTitle(companyDTO.getContactTitle());
         companyEntity.setContactPhoneNumber(companyDTO.getContactPhoneNumber());
 
-        companyRepository.save(companyEntity);
+        return companyRepository.save(companyEntity);
     }
-/*
-    public Optional<Company> updateCompanies(Company company, long id) {
-        if (company.getName() == null && company.getContactName() == null) {
-        } else if (company.getName() != null && company.getContactName() == null)
-            companyRepository.updateCompanyName(company.getName(), id);
-        else if (company.getName() == null && company.getContactName() != null)
-            companyRepository.updateCompanyName(company.getContactName(), id);
-        else {
-            companyRepository.updateContactName(company.getContactName(), company.getName(), id);
-        }
 
-
-        return companyRepository.findById(id);
-    }*/
 }

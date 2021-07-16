@@ -55,15 +55,8 @@ public class CompanyController {
     }
     @PatchMapping("/company")
     @ResponseStatus(HttpStatus.OK)
-    public void updateCompany(@RequestBody CompanyDTO companyDTO){
-        companyService.updateCompany(companyDTO);
+    public ResponseEntity<GeneralResponse<Company>> updateCompany(@RequestBody CompanyDTO companyDTO){
+        return RestUtils.buildResponse(companyService.updateCompany(companyDTO));
     }
 
-/*@PatchMapping("/company/{id}")
-public ResponseEntity<Company> updateCompanies(@RequestBody Company company, @PathVariable long id) {
-   Company result = companyService.updateCompanies(company, id).orElse(null);
-    if(result != null)
-        return new ResponseEntity(result, HttpStatus.OK);
-    return new ResponseEntity(HttpStatus.NOT_FOUND);
-}*/
 }
