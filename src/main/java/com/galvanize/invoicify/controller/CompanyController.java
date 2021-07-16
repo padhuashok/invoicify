@@ -53,4 +53,10 @@ public class CompanyController {
     {
         return RestUtils.buildResponse(companyService.save(companyDTO));
     }
+    @PatchMapping("/company")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<GeneralResponse<Company>> updateCompany(@RequestBody CompanyDTO companyDTO){
+        return RestUtils.buildResponse(companyService.updateCompany(companyDTO));
+    }
+
 }

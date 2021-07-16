@@ -1,4 +1,4 @@
-package com.galvanize.invoicify.servicetest;
+package com.galvanize.invoicify.company;
 
 import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.repository.CompanyRepository;

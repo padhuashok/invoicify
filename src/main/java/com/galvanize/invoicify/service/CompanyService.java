@@ -6,6 +6,7 @@ import com.galvanize.invoicify.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CompanyService {
@@ -34,4 +35,16 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-  }
+    public Company updateCompany(CompanyDTO companyDTO) {
+        Company companyEntity = companyRepository.findByName(companyDTO.getName());
+
+        companyEntity.setName(companyDTO.getName());
+        companyEntity.setAddress(companyDTO.getAddress());
+        companyEntity.setContactName(companyDTO.getContactName());
+        companyEntity.setContactTitle(companyDTO.getContactTitle());
+        companyEntity.setContactPhoneNumber(companyDTO.getContactPhoneNumber());
+
+        return companyRepository.save(companyEntity);
+    }
+
+}
