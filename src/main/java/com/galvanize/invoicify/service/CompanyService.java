@@ -5,6 +5,7 @@ import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +47,7 @@ public class CompanyService {
 
         companyRepository.save(companyEntity);
     }
+
 /*
     public Optional<Company> updateCompanies(Company company, long id) {
         if (company.getName() == null && company.getContactName() == null) {
@@ -60,4 +62,8 @@ public class CompanyService {
 
         return companyRepository.findById(id);
     }*/
+
+    public Optional<Company> get(long id) {
+        return companyRepository.findById(id);
+    }
 }
