@@ -1,5 +1,6 @@
 package com.galvanize.invoicify.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,4 +15,15 @@ import javax.persistence.Id;
 public class RateFee extends Fee {
     private double rate;
     private int quantity;
+
+
+    public RateFee(double rate, int quantity) {
+        this.rate = rate;
+        this.quantity = quantity;
+    }
+
+    public double getTotalFee(  ){
+        return quantity*rate;
+    }
+
 }
