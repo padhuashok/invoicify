@@ -23,18 +23,18 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
-    @GetMapping("/company")
+    @GetMapping("/companies")
     public ResponseEntity<Iterable<Company>> getCompany() {
         return new ResponseEntity(companyService.getCompany(), HttpStatus.OK);
     }
 
-    @GetMapping("/company/{id}")
+    @GetMapping("/companies/{id}")
     public Optional<Company> getById(@PathVariable(value = "id") long id) {
         return companyService.get(id);
     }
 
 
-    @PostMapping("/company")
+    @PostMapping("/companies")
     public ResponseEntity<GeneralResponse<Company>> createCompany(@Valid @RequestBody CompanyDTO companyDTO) {
 
         if (companyDTO.getContactPhoneNumber().matches("\\d{10}"))
@@ -43,8 +43,8 @@ public class CompanyController {
             return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, "ContactPhoneNumber should be 10 digit with numeric values", null);
     }
 
-    @PutMapping("/company")
-    public ResponseEntity<GeneralResponse<Company>> getCompany(@RequestBody CompanyDTO companyDTO) {
-        return RestUtils.buildResponse(companyService.save(companyDTO));
-    }
+//    @PutMapping("/company")
+//    public ResponseEntity<GeneralResponse<Company>> getCompany(@RequestBody CompanyDTO companyDTO) {
+//        return RestUtils.buildResponse(companyService.save(companyDTO));
+//    }
 }
