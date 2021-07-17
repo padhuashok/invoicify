@@ -18,7 +18,7 @@ public class CompanyService {
         this.companyRepository = companyRepository;
     }
     public List<Company> getCompany(){
-        return companyRepository.findAll();
+        return (List<Company>) companyRepository.findAll();
     }
 
     public Company save(CompanyDTO companyDTO) {
@@ -31,12 +31,12 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-    public Company add(Company company) {
-        return companyRepository.save(company);
+    public Company add(Company company) {return companyRepository.save(company);
     }
 
-    public Company updateCompany(CompanyDTO companyDTO) {
-        Company companyEntity = companyRepository.findByName(companyDTO.getName());
+
+    public Company updateCompany(CompanyDTO companyDTO, Company companyEntity) {
+
 
         companyEntity.setName(companyDTO.getName());
         companyEntity.setAddress(companyDTO.getAddress());
@@ -47,4 +47,12 @@ public class CompanyService {
         return companyRepository.save(companyEntity);
     }
 
+    public Company findByName(String name) {
+        return companyRepository.findByName(name).orElse(null);
+
+    }
+
+    public Company findById(long id) {
+        return companyRepository.findById(id).orElse(null);
+    }
 }
