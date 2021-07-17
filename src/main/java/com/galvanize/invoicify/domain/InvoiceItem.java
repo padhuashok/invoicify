@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class InvoiceItem {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private long id;
     @JoinColumn(name="itemId")
     @ManyToOne
     private Item item;

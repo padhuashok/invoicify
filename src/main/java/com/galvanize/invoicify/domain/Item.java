@@ -17,7 +17,7 @@ import java.util.List;
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    Long id;
+    private long id;
     private String description;
     private int quantity;
     private double totalFee;
@@ -32,10 +32,10 @@ public class Item {
     public Item(ItemDto e){
 
         if(e.getIsFlatFee()) {
-            e.setFee(new FlatFee(e.getAmountFlatFee()));
+            e.setFee(new FlatFee(e.getAmount()));
         }
         else{
-            e.setFee(new RateFee(e.getRateFee(), e.getQuantityFee()));
+            e.setFee(new RateFee(e.getRateFee(), e.getQuantity()));
         }
         this.setQuantity(e.getQuantity());
         this.setTotalFee(e.getFee());

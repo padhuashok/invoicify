@@ -6,6 +6,7 @@ import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.utils.InvoicifyStringUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -47,28 +48,38 @@ public class ApiTests {
     @MockBean
     InvoiceItemService invoiceItemService;
 
-    @Test
-    void addItemtoInvoice() throws Exception{
-        ItemDto itemdto1=new ItemDto("Dev Items",5,true,2.3);
-        ItemDto itemdto2 = new ItemDto("Dev Items More",2,false,2.3,10);
-        //create request to call api to create and check result
-        List<ItemDto> dtoitems=new ArrayList<>();
-        dtoitems.add(itemdto1);
-        dtoitems.add(itemdto2);
-        Item item1=new Item(itemdto1);
-        Item item2=new Item(itemdto2);
-        List<Item> itemList= Arrays.asList(item1,item2);
-        when(itemservice.saveItems(anyList())).thenReturn(itemList);
-        Invoice invoice=new Invoice();
-        when(invoiceService.saveInvoice(isA(Invoice.class))).thenReturn(invoice);
+    ItemDto itemdto1;
+    ItemDto itemdto2;
+    List<ItemDto> dtoitems;
+    Item item1;
+    Item item2;
+    List<Item> itemList;
+    Invoice invoice;
+    List<InvoiceItem> invoiceItemList;
+    InvoiceItem invoiceItem;
+    InvoiceItem invoiceItem2;
+
+    @BeforeEach
+    void setup() {
+        itemdto1 = new ItemDto("Dev Items", 1, true, 25);
+        itemdto2 = new ItemDto("Dev Items More", 2, false, 2.3);
+        dtoitems = Arrays.asList(itemdto1, itemdto2);
+        item1 = new Item(itemdto1);
+        item2 = new Item(itemdto2);
+        itemList = Arrays.asList(item1, item2);
+        invoice = new Invoice();
         invoice.setId(1L);
+        invoice.setInvoiceTotal(25);
         item1.setId(1L);
         item2.setId(2L);
-        List<InvoiceItem> invoiceItemList=new ArrayList<>();
-        InvoiceItem invoiceItem=new InvoiceItem(item1,invoice);
-        InvoiceItem invoiceItem2=new InvoiceItem(item2,invoice);
-        invoiceItemList.add(invoiceItem);
-        invoiceItemList.add(invoiceItem2);
+        invoiceItem = new InvoiceItem(item1, invoice);
+        invoiceItem2 = new InvoiceItem(item2, invoice);
+        invoiceItemList = Arrays.asList(invoiceItem, invoiceItem2);
+    }
+    @Test
+    void addItemtoInvoice() throws Exception{
+        when(itemservice.saveItems(anyList())).thenReturn(itemList);
+        when(invoiceService.saveInvoice(isA(Invoice.class))).thenReturn(invoice);
         when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
         mvc.perform(post("/invoice/items")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -89,5 +100,11 @@ public class ApiTests {
                 fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
                 fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
                 fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
+    }
+
+    @Test
+    public void createInvoice(){
+
+
     }
 }

@@ -46,8 +46,8 @@ public class MockedRepoTests{
     InvoiceRepository invoiceRepository;
     @Test
     public void addItemToInvoice() throws Exception {
-        ItemDto itemdto1 = new ItemDto("Dev Items", 5, true, 2.3);
-        ItemDto itemdto2 = new ItemDto("Dev Items More", 2, false, 2.3, 10);
+        ItemDto itemdto1 = new ItemDto("Dev Items", 1, true, 50);
+        ItemDto itemdto2 = new ItemDto("Dev Items More", 2, false, 2.3);
         //create request to call api to create and check result
         List<ItemDto> dtoitems = new ArrayList<>();
         dtoitems.add(itemdto1);
