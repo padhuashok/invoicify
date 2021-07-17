@@ -1,5 +1,7 @@
 package com.galvanize.invoicify.domain;
 
+import com.galvanize.invoicify.dto.ItemDto;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,17 +13,34 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@EqualsAndHashCode
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String description;
     private int quantity;
-    @OneToOne
-    private Fee fee;
+    private double totalFee;
     @OneToMany(mappedBy = "item")
     private List<InvoiceItem> invoiceItems;
 
+    public Item(String description, int quantity, double totalFee) {
+        this.description = description;
+        this.quantity = quantity;
+        this.totalFee = totalFee;
+    }
+    public Item(ItemDto e){
 
+        if(e.getIsFlatFee()) {
+            e.setFee(new FlatFee(e.getAmountFlatFee()));
+        }
+        else{
+            e.setFee(new RateFee(e.getRateFee(), e.getQuantityFee()));
+        }
+        this.setQuantity(e.getQuantity());
+        this.setTotalFee(e.getFee());
+        this.setDescription(e.getDescription());
+
+    }
 
 }
