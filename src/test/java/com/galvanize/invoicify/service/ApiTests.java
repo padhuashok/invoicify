@@ -110,4 +110,9 @@ public class ApiTests {
 
 
     }
+
+    @Test
+    public void searchInvoiceByInvoiceNumber(){
+
+    }
 }

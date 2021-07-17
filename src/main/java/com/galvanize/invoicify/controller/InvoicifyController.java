@@ -7,10 +7,13 @@ import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.exception.ResourceNotFoundException;
+import com.galvanize.invoicify.response.GeneralResponse;
 import com.galvanize.invoicify.service.CompanyService;
 import com.galvanize.invoicify.service.InvoiceItemService;
 import com.galvanize.invoicify.service.InvoiceService;
 import com.galvanize.invoicify.service.ItemService;
+import com.galvanize.invoicify.utils.RestUtils;
+import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +29,7 @@ public class InvoicifyController {
     private InvoiceItemService invoiceItemService;
     private CompanyService companyService;
 
-    public InvoicifyController(){
+    public InvoicifyController() {
 
     }
 
@@ -56,9 +59,21 @@ public class InvoicifyController {
         List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
         //call company service to check if comapny exists and then call invoice service
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
-        Invoice invoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItems,invoiceDTO,c);
-        return new ResponseEntity<Invoice>(invoice,HttpStatus.CREATED) ;
+        Invoice invoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItems, invoiceDTO, c);
+        return new ResponseEntity<Invoice>(invoice, HttpStatus.CREATED);
     }
+
+    @GetMapping("/invoice/{invoiceNumber}")
+    public ResponseEntity<GeneralResponse<Invoice>> searchInvoiceByInvNumber(@PathVariable int invoiceNumber) throws ResourceNotFoundException {
+        try {
+            Invoice invoice = invoiceService.getInvoiceByInvoiceNumber(invoiceNumber);
+            return RestUtils.buildResponse(invoice);
+        }catch (ResourceNotFoundException ex){
+            System.out.println(ex.getMessage());
+            return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
+        }
+    }
+
 
 
 }

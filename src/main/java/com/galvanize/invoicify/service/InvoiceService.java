@@ -4,6 +4,7 @@ import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,11 @@ public class InvoiceService {
         invoiceDTO.setCreatedDate(LocalDate.now());
         Invoice invoice = new Invoice(invoiceDTO,company);
         return invoiceRepo.save(invoice);
+    }
+
+    public Invoice getInvoiceByInvoiceNumber(int invoiceNumber) throws ResourceNotFoundException {
+       return  invoiceRepo.findByInvoiceNumber(invoiceNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice number"+ invoiceNumber+" not found"));
     }
 }
 
