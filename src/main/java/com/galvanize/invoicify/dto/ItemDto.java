@@ -1,6 +1,8 @@
 package com.galvanize.invoicify.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.galvanize.invoicify.domain.Fee;
 import com.galvanize.invoicify.domain.Item;
 import lombok.AllArgsConstructor;
@@ -36,9 +38,11 @@ public class ItemDto {
         this.totalFee = item.getTotalFee();
     }
     public double getFee() {
-        return fee.getTotalFee();
+        System.out.println(fee.getTotalFee());
+        setTotalFee( fee.getTotalFee());
+        return totalFee;
     }
-
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public boolean getIsFlatFee() {
         return isFlatFee;
     }
@@ -49,6 +53,20 @@ public class ItemDto {
         if (o == null || getClass() != o.getClass()) return false;
         ItemDto itemDto = (ItemDto) o;
         return quantity == itemDto.quantity && isFlatFee == itemDto.isFlatFee && Double.compare(itemDto.rateFee, rateFee) == 0  && Double.compare(itemDto.amount, amount) == 0 && description.equals(itemDto.description) && fee.equals(itemDto.fee);
+    }
+
+
+    public void setFlatFee(boolean flatFee) {
+        isFlatFee = flatFee;
+    }
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    public double getRateFee() {
+        return rateFee;
+    }
+
+    public void setRateFee(double rateFee) {
+        this.rateFee = rateFee;
     }
 
     @Override

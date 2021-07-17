@@ -1,5 +1,6 @@
 package com.galvanize.invoicify.domain;
 
+import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.dto.InvoiceDTO;
 import lombok.*;
 
@@ -49,7 +50,17 @@ public class Invoice {
       invoiceDTo.setInvoiceStatus(this.getInvoiceStatus());
       invoiceDTo.setInvoiceNumber(this.getInvoiceNumber());
       invoiceDTo.setInvoiceItems(this.getInvoiceItems());
-      invoiceDTo.setCompanyName(this.getCompany().getName());
+      CompanyDTO companyDTO =  new CompanyDTO(this.company);
+      invoiceDTo.setCompanyDTO(companyDTO);
       return invoiceDTo;
    }
+
+    public void convertFromDTOAndCompany(InvoiceDTO d, Company c) {
+       this.invoiceTotal = d.getInvoiceTotal();
+       this.createdDate = d.getCreatedDate();
+       this.invoiceStatus = d.getInvoiceStatus();
+       this.company = c;
+       this.invoiceNumber = d.getInvoiceNumber();
+       this.invoiceItems = d.getInvoiceItems();
+    }
 }

@@ -22,7 +22,9 @@ public class RateFee extends Fee {
         this.quantity = quantity;
     }
 
-    public double getTotalFee(  ){
+    @Override
+    public double getTotalFee(){
+        System.out.println("RateFee: getTotalFee"+  quantity*rate);
         return quantity*rate;
     }
 

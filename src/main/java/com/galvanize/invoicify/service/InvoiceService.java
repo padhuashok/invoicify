@@ -47,9 +47,9 @@ public class InvoiceService {
         invoiceDTO.setCreatedDate(LocalDate.now());
         int invoiceNumber = invoiceRepo.getMaxInvoiceNumber() + 1;
         invoiceDTO.setInvoiceNumber(invoiceNumber);
-        Invoice invoice = new Invoice(invoiceDTO, company);
+        Invoice invoice = invoiceDTO.getInvoiceItems().get(0).getInvoice();
+        invoice.convertFromDTOAndCompany(invoiceDTO, company);
         invoice = saveInvoice(invoice);
-
         invoiceDTO =  invoice.convertToDTo();
         List<ItemDto> itemDToList =
                 invoice.getInvoiceItems().stream()
@@ -58,6 +58,7 @@ public class InvoiceService {
                             return new ItemDto(item);
                         }).collect(Collectors.toList());
         invoiceDTO.setItemDtoList(itemDToList);
+        invoiceDTO.setInvoiceId(invoice.getId());
         return invoiceDTO;
     }
 }

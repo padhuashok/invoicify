@@ -102,6 +102,7 @@ public class ApiTests {
         invoiceDTO.setInvoiceItems(invoiceItemList);
         invoice = new Invoice(invoiceDTO, c);
         invoice.setId(1L);
+        invoiceDTO.setInvoiceId(1L);
     }
     @Test
     void addItemtoInvoice() throws Exception{
@@ -142,6 +143,7 @@ public class ApiTests {
                 .content(InvoicifyStringUtils.asJsonString(invoiceDTO)))
                 .andExpect(status().isCreated())
                 //.andExpect(jsonPath("$.").value(invoice))
+                .andExpect(jsonPath("$.invoiceId").value(1L))
                 .andExpect(jsonPath("$.invoiceStatus").value("UNPAID"))
                 .andExpect(jsonPath("$.invoiceItems[0].item").value(item1))
                 .andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()));
