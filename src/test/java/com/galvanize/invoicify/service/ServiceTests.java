@@ -71,6 +71,9 @@ public class ServiceTests {
         invoiceItemList.add(invoiceItem);
         invoiceItemList.add(invoiceItem2);
         itemDtoList = Arrays.asList(itemdto1, itemdto2);
+
+
+
     }
     @Test
     void addItemtoInvoice() throws Exception {
@@ -93,8 +96,9 @@ public class ServiceTests {
         c.setContactName("Hey There");
         c.setName("My First Company");
         InvoiceDTO invoiceDTO = new InvoiceDTO();
-        invoiceDTO.setItemDtoList(itemDtoList);
+        invoiceDTO.setInvoiceItems(invoiceItemList);
         invoiceDTO.setCompanyId(1L);
+        invoiceDTO.setCompanyName(c.getName());
         double totalCost = 0.0;
         for (InvoiceItem i:
                 invoiceItemList) {
@@ -107,8 +111,8 @@ public class ServiceTests {
         when(companyService.getCompanyById(invoiceDTO.getCompanyId())).thenReturn(c);
         when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
         when(invoiceItemService.saveInvoiceItem(itemList, invoice)).thenReturn(invoiceItemList);
-        when(invoiceService.calculateTotalCostAndSetStatus(invoiceItemList,invoiceDTO,c)).thenReturn(invoice);
-        Invoice actualInvoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItemList,invoiceDTO,c);
+        when(invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c)).thenReturn(invoiceDTO);
+        InvoiceDTO actualInvoice = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
         assertEquals(invoice,actualInvoice);
     }
 }
