@@ -48,12 +48,7 @@ public class CompanyController {
             return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, "ContactPhoneNumber should be 10 digit with numeric values", null);
     }
 
-//    @PutMapping("/company")
-//    public ResponseEntity<GeneralResponse<Company>> getCompany(@RequestBody CompanyDTO companyDTO) {
-//        return RestUtils.buildResponse(companyService.save(companyDTO));
-//    }
-
-    @PatchMapping("/company/{id}")
+    @PutMapping("/company/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GeneralResponse<Company>> updateCompany(@RequestBody CompanyDTO companyDTO, @PathVariable Long id) {
         Company c =  companyService.findById(id);

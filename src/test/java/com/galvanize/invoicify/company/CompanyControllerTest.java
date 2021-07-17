@@ -43,8 +43,7 @@ public class CompanyControllerTest {
     @Test
     public void testGetCompany() throws Exception {
         mvc.perform(get("/company"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("length()").value(0));
+                .andExpect(status().isOk());
     }
 
     @Test
