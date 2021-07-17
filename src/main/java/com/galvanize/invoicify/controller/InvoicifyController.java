@@ -57,7 +57,7 @@ public class InvoicifyController {
     @PostMapping("/invoice")
     public ResponseEntity<Invoice> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
         List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
-        //call company service to check if comapny exists and then call invoice service
+        //call company service to check if company exists and then call invoice service
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
         Invoice invoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItems, invoiceDTO, c);
         return new ResponseEntity<Invoice>(invoice, HttpStatus.CREATED);
