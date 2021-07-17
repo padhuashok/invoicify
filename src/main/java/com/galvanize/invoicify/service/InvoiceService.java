@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -44,6 +45,14 @@ public class InvoiceService {
         invoiceDTO.setCreatedDate(LocalDate.now());
         Invoice invoice = new Invoice(invoiceDTO,company);
         return invoiceRepo.save(invoice);
+    }
+
+    public void deleteAllExpiredAndPaidInvoice() {
+        Calendar cal = Calendar.getInstance();
+        Date today = cal.getTime();
+        cal.add(Calendar.YEAR, -1);
+        Date expiryDate = cal.getTime();
+        invoiceRepo.deleteAllExpiredAndPaidInvoice(expiryDate,"PAID");
     }
 }
 

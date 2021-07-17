@@ -1,5 +1,6 @@
 package com.galvanize.invoicify.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ public class InvoiceDTO {
     private String invoiceStatus;
     private LocalDate createdDate;
     private LocalDate modifiedDate;
+    @JsonIgnore
     private List<ItemDto> itemDtoList;
     private Long companyId;
 }

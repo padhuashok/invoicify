@@ -55,6 +55,10 @@ public class InvoicifyController {
         Invoice invoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItems,invoiceDTO,c);
         return new ResponseEntity<Invoice>(invoice,HttpStatus.CREATED) ;
     }
+    @DeleteMapping("/invoice")
+    public void deleteAllExpiredAndPaidInvoice(){
+        invoiceService.deleteAllExpiredAndPaidInvoice();
+    }
 
 
 }
