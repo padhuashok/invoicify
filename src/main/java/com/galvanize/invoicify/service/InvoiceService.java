@@ -14,13 +14,15 @@ import java.util.Calendar;
 import java.util.List;
 
 @Service
-
 public class InvoiceService {
 
 
-    @Autowired
+//    @Autowired
     InvoiceRepository invoiceRepo;
 
+    public InvoiceService(InvoiceRepository invoiceRepo){
+        this.invoiceRepo= invoiceRepo;
+    }
     public List<Invoice> findAllInvoices() {
         return invoiceRepo.findAll();
     }
@@ -40,6 +42,8 @@ public class InvoiceService {
              invoiceItems) {
             totalCost += i.getItem().getTotalFee();
         }
+        int invoiceNumber = invoiceRepo.getMaxInvoiceNumber() +1;
+        invoiceDTO.setInvoiceNumber(invoiceNumber);
         invoiceDTO.setInvoiceTotal(totalCost);
         invoiceDTO.setInvoiceStatus("UNPAID");
         invoiceDTO.setCreatedDate(LocalDate.now());

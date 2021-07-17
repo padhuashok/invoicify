@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.when;
@@ -49,6 +50,8 @@ public class ServiceTests {
     InvoiceItem invoiceItem;
     InvoiceItem invoiceItem2;
     List<ItemDto> itemDtoList;
+    InvoiceDTO invoiceDTO;
+    Company company;
 
     @BeforeEach
     void setup(){
@@ -65,12 +68,20 @@ public class ServiceTests {
         invoice.setId(1L);
         item1.setId(1L);
         item2.setId(2L);
+        company = new Company();
+        company.setContactName("Hey There");
+        company.setName("My First Company");
+        invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setItemDtoList(dtoitems);
+        invoiceDTO.setCompanyId(1L);
+        invoiceDTO.setCompanyId(1L);
         invoiceItemList = new ArrayList<>();
         invoiceItem = new InvoiceItem(item1, invoice);
         invoiceItem2 = new InvoiceItem(item2, invoice);
         invoiceItemList.add(invoiceItem);
         invoiceItemList.add(invoiceItem2);
         itemDtoList = Arrays.asList(itemdto1, itemdto2);
+        invoice = new Invoice(invoiceDTO, company);
     }
     @Test
     void addItemtoInvoice() throws Exception {
@@ -87,6 +98,28 @@ public class ServiceTests {
     }
 
     @Test
+    public void testSearchInvoiceByInvalidInvoiceNumber() throws ResourceNotFoundException {
+        int invoiceNumber=1;
+        when(invoiceService.getInvoiceByInvoiceNumber(1)).thenThrow( new ResourceNotFoundException("Invoice number"+ invoiceNumber+" not found"));
+        assertThrows( ResourceNotFoundException.class, () -> invoiceService.getInvoiceByInvoiceNumber(1));
+
+    }
+
+    @Test
+    public void testSearchInvoiceByInvoiceNumber() throws ResourceNotFoundException, Exception {
+        int invoiceNumber = 1;
+        invoice.getCompany().setId(1L);
+        invoice.setId(1L);
+        invoice.setInvoiceNumber(invoiceNumber);
+        when(invoiceService.getInvoiceByInvoiceNumber(invoiceNumber)).thenReturn(invoice);
+
+        Invoice actualInvoice=invoiceService.getInvoiceByInvoiceNumber(invoiceNumber);
+        System.out.println(actualInvoice);
+        assertEquals(invoice, actualInvoice);
+    }
+
+    @Test
+
     void createInvoiceAndUpdateCompany() throws Exception, ResourceNotFoundException {
         Company c = new Company();
         c.setId(1L);
@@ -104,7 +137,7 @@ public class ServiceTests {
         invoiceDTO.setInvoiceStatus("UNPAID");
         invoiceDTO.setCreatedDate(LocalDate.now());
         Invoice invoice = new Invoice(invoiceDTO, c);
-        when(companyService.getCompanyById(invoiceDTO.getCompanyId())).thenReturn(c);
+        when(companyService.findById(invoiceDTO.getCompanyId())).thenReturn(c);
         when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
         when(invoiceItemService.saveInvoiceItem(itemList, invoice)).thenReturn(invoiceItemList);
         when(invoiceService.calculateTotalCostAndSetStatus(invoiceItemList,invoiceDTO,c)).thenReturn(invoice);

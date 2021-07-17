@@ -13,8 +13,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,13 +32,14 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest
+//@WebMvcTest
 @AutoConfigureRestDocs
-
+@SpringBootTest
+@AutoConfigureMockMvc
 public class ApiTests {
     @Autowired
     private MockMvc mvc;
@@ -98,7 +102,7 @@ public class ApiTests {
         invoiceDTO.setInvoiceTotal(totalCost);
         invoiceDTO.setInvoiceStatus("UNPAID");
         invoiceDTO.setCreatedDate(LocalDate.now());
-        Invoice invoice = new Invoice(invoiceDTO, c);
+        invoice = new Invoice(invoiceDTO, c);
     }
     @Test
     void addItemtoInvoice() throws Exception{
@@ -130,7 +134,7 @@ public class ApiTests {
     public void createInvoiceAndCalculateInvoiceTotal() throws ResourceNotFoundException, Exception {
         when(itemservice.saveItems(anyList())).thenReturn(itemList);
         when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
-        when(companyService.getCompanyById(1L)).thenReturn(company);
+        when(companyService.findById(1L)).thenReturn(company);
         when(invoiceService.calculateTotalCostAndSetStatus(anyList(),isA(InvoiceDTO.class),isA(Company.class))).thenReturn(invoice);
         mvc.perform(post("/invoice")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -143,7 +147,52 @@ public class ApiTests {
     }
 
     @Test
-    public void searchInvoiceByInvoiceNumber(){
+    public void searchInvoiceByInvalidInvoiceNumber() throws ResourceNotFoundException, Exception {
+        int invoiceNumber = 1;
+        when(invoiceService.getInvoiceByInvoiceNumber(invoiceNumber)).thenThrow( new ResourceNotFoundException("Invoice number"+ invoiceNumber+" not found"));
+        mvc.perform(get("/invoice/{invoiceNumber}", invoiceNumber))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.message").value("Invoice number"+ invoiceNumber+" not found"))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+    }
+
+    @Test
+    public void searchInvoiceByInvoiceNumber() throws ResourceNotFoundException, Exception {
+        int invoiceNumber = 1;
+        invoice.getCompany().setId(1L);
+        invoice.setId(1L);
+        invoice.setInvoiceNumber(invoiceNumber);
+        when(invoiceService.getInvoiceByInvoiceNumber(invoiceNumber)).thenReturn(invoice);
+        System.out.println(invoice);
+        mvc.perform(get("/invoice/{invoiceNumber}", invoiceNumber))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(HttpStatus.OK.name()))
+                .andExpect(jsonPath("$.data.id").value(invoice.getId()))
+                .andExpect(jsonPath("$.data.invoiceNumber").value(invoice.getInvoiceNumber()))
+                //.andExpect(jsonPath("$.invoiceItems").value(invoiceItemList))
+                .andExpect(jsonPath("$.data.invoiceTotal").value(invoice.getInvoiceTotal()))
+                .andExpect(jsonPath("$.data.invoiceStatus").value(invoice.getInvoiceStatus()))
+                .andExpect(jsonPath("$.data.createdDate").value(invoice.getCreatedDate().toString()))
+                .andDo((document("Search Invoice GET", responseFields(
+                        fieldWithPath("status").description("Response status"),
+                        fieldWithPath("message").description("Response message"),
+                        fieldWithPath("data.id").description("Invoice ID"),
+                        fieldWithPath("data.invoiceNumber").description("Invoice number is uniques for each invoice"),
+                        fieldWithPath("data.invoiceItems").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceTotal").description("Total cost for a invoice"),
+                        fieldWithPath("data.invoiceStatus").description("Invoice can have unpaid, paid status"),
+                        fieldWithPath("data.createdDate").description("Create date of invoice"),
+                        fieldWithPath("data.modifiedDate").description("Modified Date"),
+                        fieldWithPath("data.company.id").description("Company id"),
+                        fieldWithPath("data.company.name").description("Company name"),
+                        fieldWithPath("data.company.address").description("Company address"),
+                        fieldWithPath("data.company.contactName").description("Company contact Name"),
+                        fieldWithPath("data.company.contactTitle").description("Company contactTitle"),
+                        fieldWithPath("data.company.contactPhoneNumber").description("Company contactPhoneNumber"),
+                        fieldWithPath("data.company.invoices").description("Company invoices")))));
 
     }
 }

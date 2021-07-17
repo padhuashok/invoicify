@@ -14,6 +14,7 @@ import com.galvanize.invoicify.service.InvoiceService;
 import com.galvanize.invoicify.service.ItemService;
 import com.galvanize.invoicify.utils.RestUtils;
 import com.sun.xml.bind.v2.runtime.output.SAXOutput;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +30,9 @@ public class InvoicifyController {
     private InvoiceItemService invoiceItemService;
     private CompanyService companyService;
 
-    public InvoicifyController() {
-
-    }
+//    public InvoicifyController() {
+//
+//    }
 
     public InvoicifyController(InvoiceService invoiceService, ItemService itemService, InvoiceItemService invoiceItemService, CompanyService companyService) {
         this.invoiceService = invoiceService;
@@ -58,7 +59,7 @@ public class InvoicifyController {
     public ResponseEntity<Invoice> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
         List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
         //call company service to check if company exists and then call invoice service
-        Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
+        Company c = companyService.findById(invoiceDTO.getCompanyId());
         Invoice invoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItems, invoiceDTO, c);
         return new ResponseEntity<Invoice>(invoice, HttpStatus.CREATED);
     }
@@ -70,7 +71,7 @@ public class InvoicifyController {
             return RestUtils.buildResponse(invoice);
         }catch (ResourceNotFoundException ex){
             System.out.println(ex.getMessage());
-            return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
+            return RestUtils.buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), null);
         }
     }
 
