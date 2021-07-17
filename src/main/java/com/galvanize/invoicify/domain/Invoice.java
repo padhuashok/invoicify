@@ -22,6 +22,8 @@ public class Invoice {
 
    private double invoiceTotal;
 
+   @ManyToOne
+   private Company company;
 
    public double calculateInvoiceTotal(){
       double temp=0;

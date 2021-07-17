@@ -7,6 +7,7 @@ import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.repository.InvoiceItemRepository;
 import com.galvanize.invoicify.repository.InvoiceRepository;
 import com.galvanize.invoicify.repository.ItemRepository;
+import com.galvanize.invoicify.service.CompanyService;
 import com.galvanize.invoicify.utils.InvoicifyStringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,10 @@ public class MockedRepoTests{
     ItemRepository itemRepository;
     @MockBean
     InvoiceRepository invoiceRepository;
+
+    @MockBean
+    CompanyService companyService;
+
     @Test
     public void addItemToInvoice() throws Exception {
         ItemDto itemdto1 = new ItemDto("Dev Items", 5, true, 2.3);
@@ -85,6 +90,7 @@ public class MockedRepoTests{
                         fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
                         fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
                         fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.company").description("Company the invoice is associated to"),
                         fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
     }
 

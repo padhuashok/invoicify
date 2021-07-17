@@ -47,6 +47,10 @@ public class ApiTests {
     @MockBean
     InvoiceItemService invoiceItemService;
 
+    @MockBean
+    CompanyService companyService;
+
+
     @Test
     void addItemtoInvoice() throws Exception{
         ItemDto itemdto1=new ItemDto("Dev Items",5,true,2.3);
@@ -88,6 +92,7 @@ public class ApiTests {
                 fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
                 fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
                 fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
+                fieldWithPath("[].invoice.company").description("Company the invoice is associated to"),
                 fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
     }
 }
