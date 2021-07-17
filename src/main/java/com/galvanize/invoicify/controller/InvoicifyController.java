@@ -26,6 +26,10 @@ public class InvoicifyController {
     private InvoiceItemService invoiceItemService;
     private CompanyService companyService;
 
+    public InvoicifyController(){
+
+    }
+
     public InvoicifyController(InvoiceService invoiceService, ItemService itemService, InvoiceItemService invoiceItemService, CompanyService companyService) {
         this.invoiceService = invoiceService;
         this.itemService = itemService;

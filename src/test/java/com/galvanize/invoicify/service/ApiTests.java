@@ -48,6 +48,9 @@ public class ApiTests {
     @MockBean
     InvoiceItemService invoiceItemService;
 
+    @MockBean
+    CompanyService companyService;
+
     ItemDto itemdto1;
     ItemDto itemdto2;
     List<ItemDto> dtoitems;

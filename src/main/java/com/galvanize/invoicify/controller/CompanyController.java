@@ -5,8 +5,11 @@ import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.response.GeneralResponse;
 import com.galvanize.invoicify.service.CompanyService;
 import com.galvanize.invoicify.utils.RestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +19,12 @@ import javax.validation.Valid;
 @Validated
 public class CompanyController {
 
-
     CompanyService companyService;
+
+    public CompanyController(){
+
+    }
+
 
     public CompanyController(CompanyService companyService)
 
