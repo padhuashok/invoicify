@@ -45,5 +45,10 @@ public class InvoicifyController {
 
     }
 
+    @GetMapping(value = "/invoice/list")
+    public ResponseEntity<List<Invoice>> getInvoiceList()
+    {
+        return new ResponseEntity<List<Invoice>>(invoiceService.findInvoices(), HttpStatus.CREATED);
+    }
 
 }
