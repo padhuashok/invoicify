@@ -32,3 +32,11 @@ It runs in a containerized enviroment and used Postgres as DB.
 Before starting the build, Copy dos2unix file to root folder 
 once copied, issue following command
 dos2unix gradlew
+
+##**EndPoints**
+
+GET Company endpoint: "/company"
+
+POST Company endpoint: "/company"
+
+PUT Company endpoint: "/company/{id}"
