@@ -8,7 +8,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface CompanyRepository extends JpaRepository<Company,Long> {
-    Company findByName(String name);
+import java.util.Optional;
+
+
+public interface CompanyRepository extends CrudRepository<Company,Long> {
+    @Query("Select c from Company c where lower(c.name) =?1")
+    Optional<Company> findByName(String name);
 
 }

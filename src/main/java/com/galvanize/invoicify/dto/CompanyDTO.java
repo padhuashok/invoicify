@@ -4,6 +4,7 @@ package com.galvanize.invoicify.dto;
 import com.sun.istack.NotNull;
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Pattern;
 
 @Getter
@@ -14,6 +15,7 @@ import javax.validation.constraints.Pattern;
 public class CompanyDTO {
     private long id;
     @NotNull
+    @Column(unique=true)
     private String name;
     @NotNull
     private String address;

@@ -2,7 +2,6 @@ package com.galvanize.invoicify.service;
 
 import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.dto.CompanyDTO;
-import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +18,7 @@ public class CompanyService {
         this.companyRepository = companyRepository;
     }
     public List<Company> getCompany(){
-        return companyRepository.findAll();
-    }
-
-    public Company getCompanyById(Long companyId) throws ResourceNotFoundException {
-        Optional<Company> company = companyRepository.findById(companyId);
-        if(!company.isPresent()){
-            throw new ResourceNotFoundException("Company Not Found");
-        }
-        return company.get();
+        return (List<Company>) companyRepository.findAll();
     }
 
     public Company save(CompanyDTO companyDTO) {
@@ -40,12 +31,12 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-    public Company add(Company company) {
-        return companyRepository.save(company);
+    public Company add(Company company) {return companyRepository.save(company);
     }
 
-    public Company updateCompany(CompanyDTO companyDTO) {
-        Company companyEntity = companyRepository.findByName(companyDTO.getName());
+
+    public Company updateCompany(CompanyDTO companyDTO, Company companyEntity) {
+
 
         companyEntity.setName(companyDTO.getName());
         companyEntity.setAddress(companyDTO.getAddress());
@@ -56,4 +47,12 @@ public class CompanyService {
         return companyRepository.save(companyEntity);
     }
 
+    public Company findByName(String name) {
+        return companyRepository.findByName(name).orElse(null);
+
+    }
+
+    public Company findById(long id) {
+        return companyRepository.findById(id).orElse(null);
+    }
 }
