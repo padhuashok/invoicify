@@ -8,28 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 public interface CompanyRepository extends JpaRepository<Company,Long> {
     Company findByName(String name);
-
-//    @Transactional
-//    @Modifying
-//    @Query("Update Company p set p.name = :name where p.id = :id")
-//    void updateCompanyName(@Param("name") String name, @Param("id") Long id);
-
-//    @Transactional
-//    @Modifying
-//    @Query("Update Company p set p.breed = :breed where p.id = :id")
-//    void updateContactName(@Param("contactName") String contactName, @Param("id") Long id);
-//    }
-
-
-//    @Transactional
-//    @Modifying
-//    @Query("Update Company p set p.breed = :breed, p.name = :name where p.id = :id")
-//    void updateContactName(@Param("contactName") String contactName, @Param("name") String name, @Param("id") Long id);
-
-    Optional<Company> findById(long id);
 
 }

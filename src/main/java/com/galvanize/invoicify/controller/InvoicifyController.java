@@ -1,10 +1,13 @@
 package com.galvanize.invoicify.controller;
 
+import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
+import com.galvanize.invoicify.service.CompanyService;
 import com.galvanize.invoicify.service.InvoiceItemService;
 import com.galvanize.invoicify.service.InvoiceService;
 import com.galvanize.invoicify.service.ItemService;
@@ -15,16 +18,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+
 public class InvoicifyController {
 
     private InvoiceService invoiceService;
     private ItemService itemService;
     private InvoiceItemService invoiceItemService;
+    private CompanyService companyService;
 
-    public InvoicifyController(InvoiceService invoiceService, ItemService itemService, InvoiceItemService invoiceItemService) {
+    public InvoicifyController(InvoiceService invoiceService, ItemService itemService, InvoiceItemService invoiceItemService, CompanyService companyService) {
         this.invoiceService = invoiceService;
         this.itemService = itemService;
         this.invoiceItemService = invoiceItemService;
+        this.companyService = companyService;
     }
 
     @GetMapping(value = "/healthcheck")
@@ -42,11 +48,12 @@ public class InvoicifyController {
     }
 
     @PostMapping("/invoice")
-    public ResponseEntity<Invoice> createInvoice(@RequestBody InvoiceDTO invoiceDTO){
-        List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList());
+    public ResponseEntity<Invoice> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
+        List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
         //call company service to check if comapny exists and then call invoice service
-        Company c = companyService.getCompany(invoiceDTO.getCompanyId());
-        invoiceService.calculateTotalCostAndSetStatus(invoiceItems);
+        Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
+        Invoice invoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItems,invoiceDTO,c);
+        return new ResponseEntity<Invoice>(invoice,HttpStatus.CREATED) ;
     }
 
 

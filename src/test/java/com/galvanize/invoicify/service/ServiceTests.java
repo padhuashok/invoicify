@@ -1,7 +1,9 @@
 package com.galvanize.invoicify.service;
 
 import com.galvanize.invoicify.domain.*;
+import com.galvanize.invoicify.dto.InvoiceDTO;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +34,9 @@ public class ServiceTests {
 
     @MockBean
     InvoiceItemService invoiceItemService;
+
+    @MockBean
+    CompanyService companyService;
 
     ItemDto itemdto1;
     ItemDto itemdto2;
@@ -81,7 +87,28 @@ public class ServiceTests {
     }
 
     @Test
-    void createInvoice(){
-
+    void createInvoiceAndUpdateCompany() throws Exception, ResourceNotFoundException {
+        Company c = new Company();
+        c.setId(1L);
+        c.setContactName("Hey There");
+        c.setName("My First Company");
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setItemDtoList(itemDtoList);
+        invoiceDTO.setCompanyId(1L);
+        double totalCost = 0.0;
+        for (InvoiceItem i:
+                invoiceItemList) {
+            totalCost += i.getItem().getTotalFee();
+        }
+        invoiceDTO.setInvoiceTotal(totalCost);
+        invoiceDTO.setInvoiceStatus("UNPAID");
+        invoiceDTO.setCreatedDate(LocalDate.now());
+        Invoice invoice = new Invoice(invoiceDTO, c);
+        when(companyService.getCompanyById(invoiceDTO.getCompanyId())).thenReturn(c);
+        when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
+        when(invoiceItemService.saveInvoiceItem(itemList, invoice)).thenReturn(invoiceItemList);
+        when(invoiceService.calculateTotalCostAndSetStatus(invoiceItemList,invoiceDTO,c)).thenReturn(invoice);
+        Invoice actualInvoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItemList,invoiceDTO,c);
+        assertEquals(invoice,actualInvoice);
     }
 }

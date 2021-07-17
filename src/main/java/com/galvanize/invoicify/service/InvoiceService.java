@@ -1,5 +1,6 @@
 package com.galvanize.invoicify.service;
 
+import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.dto.InvoiceDTO;
@@ -32,7 +33,7 @@ public class InvoiceService {
        return  invoiceRepo.save(invoice);
     }
 
-    public List<InvoiceItem> calculateTotalCostAndSetStatus(List<InvoiceItem> invoiceItems, InvoiceDTO invoiceDTO, Company){
+    public Invoice calculateTotalCostAndSetStatus(List<InvoiceItem> invoiceItems, InvoiceDTO invoiceDTO, Company company){
         double totalCost = 0.0;
         for (InvoiceItem i:
              invoiceItems) {
@@ -41,7 +42,8 @@ public class InvoiceService {
         invoiceDTO.setInvoiceTotal(totalCost);
         invoiceDTO.setInvoiceStatus("UNPAID");
         invoiceDTO.setCreatedDate(LocalDate.now());
-        return invoiceItems;
+        Invoice invoice = new Invoice(invoiceDTO,company);
+        return invoiceRepo.save(invoice);
     }
 }
 

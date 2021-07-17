@@ -11,40 +11,52 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 @RestController
 @Validated
 public class CompanyController {
 
+
     CompanyService companyService;
 
-    public CompanyController(CompanyService companyService) {
+    public CompanyController(CompanyService companyService)
+
+    {
         this.companyService = companyService;
     }
 
-    @GetMapping("/companies")
-    public ResponseEntity<Iterable<Company>> getCompany() {
+//    @GetMapping("/company")
+//    public ResponseEntity<GeneralResponse<Company>> getCompany()
+//    {
+//        return RestUtils.buildResponse(companyService.getCompany());
+//    }
+
+
+    @GetMapping("/company")
+    public ResponseEntity<Iterable<Company>> getCompany(){
         return new ResponseEntity(companyService.getCompany(), HttpStatus.OK);
     }
 
-    @GetMapping("/companies/{id}")
-    public Optional<Company> getById(@PathVariable(value = "id") long id) {
-        return companyService.get(id);
-    }
 
+    @PostMapping("/company")
+    public ResponseEntity<GeneralResponse<Company>> createCompany(@Valid @RequestBody CompanyDTO companyDTO)
+    {
 
-    @PostMapping("/companies")
-    public ResponseEntity<GeneralResponse<Company>> createCompany(@Valid @RequestBody CompanyDTO companyDTO) {
-
-        if (companyDTO.getContactPhoneNumber().matches("\\d{10}"))
+        if(companyDTO.getContactPhoneNumber().matches("\\d{10}"))
             return RestUtils.buildResponse(companyService.save(companyDTO));
         else
             return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, "ContactPhoneNumber should be 10 digit with numeric values", null);
     }
 
-//    @PutMapping("/company")
-//    public ResponseEntity<GeneralResponse<Company>> getCompany(@RequestBody CompanyDTO companyDTO) {
-//        return RestUtils.buildResponse(companyService.save(companyDTO));
-//    }
+    @PutMapping("/company")
+    public ResponseEntity<GeneralResponse<Company>> getCompany(@RequestBody CompanyDTO companyDTO)
+    {
+        return RestUtils.buildResponse(companyService.save(companyDTO));
+    }
+    @PatchMapping("/company")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<GeneralResponse<Company>> updateCompany(@RequestBody CompanyDTO companyDTO){
+        return RestUtils.buildResponse(companyService.updateCompany(companyDTO));
+    }
+
 }

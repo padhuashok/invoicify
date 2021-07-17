@@ -2,6 +2,7 @@ package com.galvanize.invoicify.service;
 
 import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.dto.CompanyDTO;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,14 @@ public class CompanyService {
         return companyRepository.findAll();
     }
 
+    public Company getCompanyById(Long companyId) throws ResourceNotFoundException {
+        Optional<Company> company = companyRepository.findById(companyId);
+        if(!company.isPresent()){
+            throw new ResourceNotFoundException("Company Not Found");
+        }
+        return company.get();
+    }
+
     public Company save(CompanyDTO companyDTO) {
         Company company = new Company();
         company.setName(companyDTO.getName());
@@ -35,7 +44,7 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-    public void updateCompany(CompanyDTO companyDTO) {
+    public Company updateCompany(CompanyDTO companyDTO) {
         Company companyEntity = companyRepository.findByName(companyDTO.getName());
 
         companyEntity.setName(companyDTO.getName());
@@ -44,24 +53,7 @@ public class CompanyService {
         companyEntity.setContactTitle(companyDTO.getContactTitle());
         companyEntity.setContactPhoneNumber(companyDTO.getContactPhoneNumber());
 
-        companyRepository.save(companyEntity);
+        return companyRepository.save(companyEntity);
     }
 
-    public Optional<Company> get(long id) {
-        return companyRepository.findById(id);
-    }
-/*
-    public Optional<Company> updateCompanies(Company company, long id) {
-        if (company.getName() == null && company.getContactName() == null) {
-        } else if (company.getName() != null && company.getContactName() == null)
-            companyRepository.updateCompanyName(company.getName(), id);
-        else if (company.getName() == null && company.getContactName() != null)
-            companyRepository.updateCompanyName(company.getContactName(), id);
-        else {
-            companyRepository.updateContactName(company.getContactName(), company.getName(), id);
-        }
-
-
-        return companyRepository.findById(id);
-    }*/
 }
