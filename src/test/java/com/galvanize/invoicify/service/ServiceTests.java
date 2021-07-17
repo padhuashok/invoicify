@@ -30,6 +30,10 @@ public class ServiceTests {
 
     @MockBean
     InvoiceItemService invoiceItemService;
+
+    @MockBean
+    CompanyService companyService;
+
     @Test
     void addItemtoInvoice() throws Exception {
         ItemDto itemdto1 = new ItemDto("Dev Items", 5, true, 2.3);
