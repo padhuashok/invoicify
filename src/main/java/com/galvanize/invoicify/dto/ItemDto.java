@@ -2,6 +2,7 @@ package com.galvanize.invoicify.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.galvanize.invoicify.domain.Fee;
+import com.galvanize.invoicify.domain.Item;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,12 +22,18 @@ public class ItemDto {
     private boolean isFlatFee;
     private double rateFee;
     private double amount;
+    private double totalFee;
 
     public ItemDto(String description, int quantity, boolean isFlatFee, double amount) {
         this.description = description;
         this.quantity = quantity;
         this.isFlatFee = isFlatFee;
         this.amount = amount;
+    }
+    public ItemDto(Item item){
+        this.description = item.getDescription();
+        this.quantity = item.getQuantity();
+        this.totalFee = item.getTotalFee();
     }
     public double getFee() {
         return fee.getTotalFee();

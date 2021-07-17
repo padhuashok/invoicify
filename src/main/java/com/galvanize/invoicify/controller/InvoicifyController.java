@@ -13,18 +13,20 @@ import com.galvanize.invoicify.service.InvoiceService;
 import com.galvanize.invoicify.service.ItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-
 public class InvoicifyController {
 
-    private InvoiceService invoiceService;
-    private ItemService itemService;
-    private InvoiceItemService invoiceItemService;
-    private CompanyService companyService;
+    private final InvoiceService invoiceService;
+    private final ItemService itemService;
+    private final InvoiceItemService invoiceItemService;
+    private final CompanyService companyService;
 
     public InvoicifyController(InvoiceService invoiceService, ItemService itemService, InvoiceItemService invoiceItemService, CompanyService companyService) {
         this.invoiceService = invoiceService;
@@ -44,16 +46,17 @@ public class InvoicifyController {
         Invoice invoice = new Invoice();
         invoice = invoiceService.saveInvoice(invoice);
         List<InvoiceItem> invoiceItems = invoiceItemService.saveInvoiceItem(items, invoice);
-        return new ResponseEntity<List<InvoiceItem>>(invoiceItems, HttpStatus.CREATED);
+        return new ResponseEntity<>(invoiceItems, HttpStatus.CREATED);
     }
 
     @PostMapping("/invoice")
-    public ResponseEntity<Invoice> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
-        List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
+    public ResponseEntity<InvoiceDTO> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
+        List<InvoiceItem> invoiceItems = invoiceDTO.getInvoiceItems();
+       // List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
         //call company service to check if company exists and then call invoice service
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
-        Invoice invoice = invoiceService.calculateTotalCostAndSetStatus(invoiceItems,invoiceDTO,c);
-        return new ResponseEntity<Invoice>(invoice,HttpStatus.CREATED) ;
+        invoiceDTO= invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
+        return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
     }
 
 

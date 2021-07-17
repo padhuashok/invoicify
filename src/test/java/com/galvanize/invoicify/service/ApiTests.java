@@ -19,12 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -77,7 +77,7 @@ public class ApiTests {
         item2 = new Item(itemdto2);
         itemList = Arrays.asList(item1, item2);
         invoice = new Invoice();
-        invoice.setId(1L);
+
         invoice.setInvoiceTotal(25);
         item1.setId(1L);
         item2.setId(2L);
@@ -88,7 +88,7 @@ public class ApiTests {
         c.setContactName("Hey There");
         c.setName("My First Company");
         invoiceDTO = new InvoiceDTO();
-        invoiceDTO.setItemDtoList(dtoitems);
+//        invoiceDTO.setItemDtoList(dtoitems);
         invoiceDTO.setCompanyId(1L);
         double totalCost = 0.0;
         for (InvoiceItem i:
@@ -98,7 +98,10 @@ public class ApiTests {
         invoiceDTO.setInvoiceTotal(totalCost);
         invoiceDTO.setInvoiceStatus("UNPAID");
         invoiceDTO.setCreatedDate(LocalDate.now());
-        Invoice invoice = new Invoice(invoiceDTO, c);
+        invoiceDTO.setInvoiceNumber(1);
+        invoiceDTO.setInvoiceItems(invoiceItemList);
+        invoice = new Invoice(invoiceDTO, c);
+        invoice.setId(1L);
     }
     @Test
     void addItemtoInvoice() throws Exception{
@@ -123,22 +126,24 @@ public class ApiTests {
                 fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
                 fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
                 fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
+                fieldWithPath("[].invoice.company").description("Company the invoice is associated to"),
                 fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
     }
 
     @Test
     public void createInvoiceAndCalculateInvoiceTotal() throws ResourceNotFoundException, Exception {
-        when(itemservice.saveItems(anyList())).thenReturn(itemList);
-        when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
+
         when(companyService.getCompanyById(1L)).thenReturn(company);
-        when(invoiceService.calculateTotalCostAndSetStatus(anyList(),isA(InvoiceDTO.class),isA(Company.class))).thenReturn(invoice);
+        when(invoiceService.calculateTotalCostAndSetStatus(isA(InvoiceDTO.class),isA(Company.class))).thenReturn(invoiceDTO);
+        System.out.println(invoice);
+
         mvc.perform(post("/invoice")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(InvoicifyStringUtils.asJsonString(invoiceDTO)))
-                .andExpect(status().isCreated());
-//                .andExpect(jsonPath("$").value(invoice))
-//                .andExpect(jsonPath("$.invoiceStatus").value("UNPAID"))
-//                .andExpect(jsonPath("$.invoiceItems[0].item").value(item1));
-//                //.andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()));
+                .andExpect(status().isCreated())
+                //.andExpect(jsonPath("$.").value(invoice))
+                .andExpect(jsonPath("$.invoiceStatus").value("UNPAID"))
+                .andExpect(jsonPath("$.invoiceItems[0].item").value(item1))
+                .andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()));
     }
 }

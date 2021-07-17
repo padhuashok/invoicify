@@ -1,10 +1,7 @@
 package com.galvanize.invoicify.domain;
 
 import com.galvanize.invoicify.dto.ItemDto;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.List;
 @Setter
 @Entity
 @EqualsAndHashCode
+@ToString
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

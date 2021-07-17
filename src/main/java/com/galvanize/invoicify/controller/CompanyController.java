@@ -5,23 +5,19 @@ import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.response.GeneralResponse;
 import com.galvanize.invoicify.service.CompanyService;
 import com.galvanize.invoicify.utils.RestUtils;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
 
 @RestController
 @Validated
 public class CompanyController {
 
-
     CompanyService companyService;
-
-    public CompanyController(CompanyService companyService)
-
-    {
+    public CompanyController(CompanyService companyService){
         this.companyService = companyService;
     }
 
@@ -39,7 +35,7 @@ public class CompanyController {
 
 
     @PostMapping("/company")
-    public ResponseEntity<GeneralResponse<Company>> createCompany(@Valid @RequestBody CompanyDTO companyDTO)
+    public ResponseEntity<GeneralResponse<Company>> createCompany(@RequestBody CompanyDTO companyDTO)
     {
 
         if(companyDTO.getContactPhoneNumber().matches("\\d{10}"))
