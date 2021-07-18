@@ -5,17 +5,21 @@ import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.exception.ResourceNotFoundException;
+import com.galvanize.invoicify.response.GeneralResponse;
 import com.galvanize.invoicify.service.CompanyService;
 import com.galvanize.invoicify.service.InvoiceItemService;
 import com.galvanize.invoicify.service.InvoiceService;
 import com.galvanize.invoicify.service.ItemService;
+import com.galvanize.invoicify.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class InvoicifyController {
@@ -56,8 +60,24 @@ public class InvoicifyController {
         return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
     }
     @DeleteMapping("/invoice")
-    public void deleteAllExpiredAndPaidInvoice(){
-        invoiceService.deleteAllExpiredAndPaidInvoice();
+    public ResponseEntity<GeneralResponse<String>> deleteAllExpiredAndPaidInvoice(){
+        try {
+            List<InvoiceItemId> expiredList = invoiceService.getInvoiceExpiredAndPaid();
+            if (!expiredList.isEmpty()) {
+                List<Long> invoiceItemIds = expiredList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
+                invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);
+
+                List<Long> itemIds = expiredList.stream().map(ex -> ex.getItemId()).collect(Collectors.toList());
+                itemService.deleteByIds(itemIds);
+                List<Long> invoiceIds = expiredList.stream().map(ex -> ex.getInvoiceId()).collect(Collectors.toList());
+                invoiceService.deleteByIds(invoiceIds);
+            }
+        }catch (Exception e){
+            System.out.println(e);
+            return RestUtils.buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "FAILED");
+        }
+        return RestUtils.buildResponse("SUCCESSED");
+
     }
 
 

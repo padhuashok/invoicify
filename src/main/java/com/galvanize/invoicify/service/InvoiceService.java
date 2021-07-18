@@ -5,7 +5,9 @@ import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.repository.InvoiceItemRepository;
 import com.galvanize.invoicify.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,15 +19,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-
 public class InvoiceService {
 
-
-    @Autowired
     InvoiceRepository invoiceRepo;
 
+    InvoiceItemRepository invoiceItemRepository;
+
+    public InvoiceService(InvoiceRepository invoiceRepo, InvoiceItemRepository invoiceItemRepo){
+        this.invoiceRepo = invoiceRepo;
+        this.invoiceItemRepository = invoiceItemRepo;
+    }
     public List<Invoice> findAllInvoices() {
-        return invoiceRepo.findAll();
+        return (List<Invoice>) invoiceRepo.findAll();
     }
 
     public void addInvoice(Invoice inv) {
@@ -63,12 +68,27 @@ public class InvoiceService {
         return invoiceDTO;
     }
 
-    public void deleteAllExpiredAndPaidInvoice() {
-        Calendar cal = Calendar.getInstance();
-        Date today = cal.getTime();
-        cal.add(Calendar.YEAR, -1);
-        Date expiryDate = cal.getTime();
-        invoiceRepo.deleteAllExpiredAndPaidInvoice(expiryDate,"PAID");
+//    public void deleteAllExpiredAndPaidInvoice() {
+//
+//        Calendar cal = Calendar.getInstance();
+//        Date today = cal.getTime();
+//        cal.add(Calendar.YEAR, -1);
+//        Date expiryDate = cal.getTime();
+//        invoiceRepo.deleteAllExpiredAndPaidInvoice(expiryDate,"PAID");
+//    }
+
+    public List<InvoiceItemId> getInvoiceExpiredAndPaid() {
+       // return invoiceRepo.getInvoiceExpiredAndPaid();
+        List<InvoiceItem> invoiceItems =(List<InvoiceItem>) invoiceItemRepository.findAll();
+
+        return invoiceItems.stream().map(invoiceItem  -> {
+            return  new InvoiceItemId(invoiceItem) ;
+        }).collect(Collectors.toList());
+    }
+
+    public void deleteByIds(List<Long> invoiceIds) {
+        invoiceRepo.deleteInvoicesByIds(invoiceIds);
+        //invoiceRepo.deleteAllById(invoiceIds);
     }
 }
 

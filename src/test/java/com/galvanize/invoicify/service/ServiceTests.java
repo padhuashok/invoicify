@@ -2,6 +2,7 @@ package com.galvanize.invoicify.service;
 
 import com.galvanize.invoicify.domain.*;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -98,7 +99,6 @@ public class ServiceTests {
         InvoiceDTO invoiceDTO = new InvoiceDTO();
         invoiceDTO.setInvoiceItems(invoiceItemList);
         invoiceDTO.setCompanyId(1L);
-        invoiceDTO.setCompanyName(c.getName());
         double totalCost = 0.0;
         for (InvoiceItem i:
                 invoiceItemList) {
@@ -114,5 +114,36 @@ public class ServiceTests {
         when(invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c)).thenReturn(invoiceDTO);
         InvoiceDTO actualInvoice = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
         assertEquals(invoice,actualInvoice);
+    }
+
+    @Test
+    public void deleteExpiredAndPaidInvoice() throws Exception{
+        List<Item> actualItems = itemservice.saveItems(itemDtoList);
+        Invoice actualInvoice = invoiceService.saveInvoice(invoice);
+        List<InvoiceItem> invoiceItemList = invoiceItemService.saveInvoiceItem(itemList, invoice);
+        Company c = new Company();
+        c.setId(1L);
+        c.setContactName("Hey There");
+        c.setName("My First Company");
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setInvoiceItems(invoiceItemList);
+        invoiceDTO.setCompanyId(1L);
+        double totalCost = 0.0;
+        for (InvoiceItem i:
+                invoiceItemList) {
+            totalCost += i.getItem().getTotalFee();
+        }
+        invoiceDTO.setInvoiceTotal(totalCost);
+        invoiceDTO.setInvoiceStatus("UNPAID");
+        invoiceDTO.setCreatedDate(LocalDate.now());
+        Invoice invoice = new Invoice(invoiceDTO, c);
+        List<InvoiceItemId> invoiceItemIdList= new ArrayList<>();
+        invoiceItemList.forEach( invIt -> {
+            invoiceItemIdList.add(new InvoiceItemId(invIt.getId(), invIt.getItem().getId(), invIt.getInvoice().getId()));
+        });
+                //List<InvoiceItem> invoiceItems =(List<InvoiceItem>) invoiceItemRepository.findAll();
+
+        //when(invoiceService.getInvoiceExpiredAndPaid()).thenReturn(invoiceItemList);
+
     }
 }
