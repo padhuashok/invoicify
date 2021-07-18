@@ -90,6 +90,8 @@ public class InvoiceService {
         invoiceRepo.deleteInvoicesByIds(invoiceIds);
         //invoiceRepo.deleteAllById(invoiceIds);
     }
+
+
 }
 
 

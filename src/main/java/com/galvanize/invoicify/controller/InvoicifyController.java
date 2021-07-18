@@ -59,10 +59,14 @@ public class InvoicifyController {
         invoiceDTO= invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
         return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
     }
+
     @DeleteMapping("/invoice")
+    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GeneralResponse<String>> deleteAllExpiredAndPaidInvoice(){
         try {
-            List<InvoiceItemId> expiredList = invoiceService.getInvoiceExpiredAndPaid();
+            List<InvoiceItem>  invoiceItemList = invoiceItemService.getInvoiceExpiredAndPaid();
+
+            List<InvoiceItemId> expiredList = invoiceItemList.stream().map( invIt -> new InvoiceItemId(invIt)).collect(Collectors.toList());
             if (!expiredList.isEmpty()) {
                 List<Long> invoiceItemIds = expiredList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
                 invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);

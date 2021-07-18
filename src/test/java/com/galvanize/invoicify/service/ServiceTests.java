@@ -16,11 +16,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @WebMvcTest
 public class ServiceTests {
@@ -31,7 +30,7 @@ public class ServiceTests {
     InvoiceService invoiceService;
 
     @MockBean
-    ItemService itemservice;
+    ItemService itemService;
 
     @MockBean
     InvoiceItemService invoiceItemService;
@@ -78,8 +77,8 @@ public class ServiceTests {
     }
     @Test
     void addItemtoInvoice() throws Exception {
-        when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
-        List<Item> actualItems = itemservice.saveItems(itemDtoList);
+        when(itemService.saveItems(itemDtoList)).thenReturn(itemList);
+        List<Item> actualItems = itemService.saveItems(itemDtoList);
         assertEquals(itemList, actualItems);
         when(invoiceService.saveInvoice(invoice)).thenReturn(invoice);
         Invoice actualInvoice = invoiceService.saveInvoice(invoice);
@@ -109,7 +108,7 @@ public class ServiceTests {
         invoiceDTO.setCreatedDate(LocalDate.now());
         Invoice invoice = new Invoice(invoiceDTO, c);
         when(companyService.getCompanyById(invoiceDTO.getCompanyId())).thenReturn(c);
-        when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
+        when(itemService.saveItems(itemDtoList)).thenReturn(itemList);
         when(invoiceItemService.saveInvoiceItem(itemList, invoice)).thenReturn(invoiceItemList);
         when(invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c)).thenReturn(invoiceDTO);
         InvoiceDTO actualInvoice = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
@@ -118,7 +117,7 @@ public class ServiceTests {
 
     @Test
     public void deleteExpiredAndPaidInvoice() throws Exception{
-        List<Item> actualItems = itemservice.saveItems(itemDtoList);
+        List<Item> actualItems = itemService.saveItems(itemDtoList);
         Invoice actualInvoice = invoiceService.saveInvoice(invoice);
         List<InvoiceItem> invoiceItemList = invoiceItemService.saveInvoiceItem(itemList, invoice);
         Company c = new Company();
@@ -141,9 +140,18 @@ public class ServiceTests {
         invoiceItemList.forEach( invIt -> {
             invoiceItemIdList.add(new InvoiceItemId(invIt.getId(), invIt.getItem().getId(), invIt.getInvoice().getId()));
         });
-                //List<InvoiceItem> invoiceItems =(List<InvoiceItem>) invoiceItemRepository.findAll();
 
-        //when(invoiceService.getInvoiceExpiredAndPaid()).thenReturn(invoiceItemList);
+        when(invoiceService.getInvoiceExpiredAndPaid()).thenReturn(invoiceItemIdList);
 
+        List<Long> invoiceItemIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
+        List<Long> itemIds = invoiceItemIdList.stream().map(ex -> ex.getItemId()).collect(Collectors.toList());
+        List<Long> invoiceIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceId()).collect(Collectors.toList());
+        doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceItemIds);
+        doNothing().when(itemService).deleteByIds(itemIds);
+        doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceIds);
+
+        invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);
+        itemService.deleteByIds(itemIds);
+        invoiceService.deleteByIds(invoiceIds);
     }
 }

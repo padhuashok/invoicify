@@ -30,4 +30,9 @@ public class InvoiceItemService {
         invoicItemRepository.deleteAllById(invoiceItemIds);
         System.out.println("complete delete invoice item");
     }
+
+
+    public List<InvoiceItem> getInvoiceExpiredAndPaid() {
+        return invoicItemRepository.getInvoiceExpiredAndPaid();
+    }
 }
