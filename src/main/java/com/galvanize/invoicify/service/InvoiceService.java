@@ -7,14 +7,12 @@ import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
 import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.InvoiceItemRepository;
 import com.galvanize.invoicify.repository.InvoiceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,6 +90,11 @@ public class InvoiceService {
     }
 
 
+    public Invoice findUnpaidInvoiceByInvoiceNumber(int invoiceNumber) throws ResourceNotFoundException {
+        return invoiceRepo.findUnpaidInvoiceByInvoiceNumber(invoiceNumber)
+                .orElseThrow( () -> new ResourceNotFoundException("Cannot find UNPAID invoice with invoice number "+ invoiceNumber)
+        );
+    }
 }
 
 

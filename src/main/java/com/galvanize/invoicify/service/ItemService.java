@@ -32,4 +32,8 @@ public class ItemService {
         itemRepository.deleteAllById(itemIds);
         System.out.println("delete item complete");
     }
+
+    public List<Item> updateItems(List<Item> items) {
+        return itemRepository.saveAll(items);
+    }
 }
