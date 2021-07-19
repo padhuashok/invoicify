@@ -56,6 +56,11 @@ public class InvoicifyController {
         return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
     }
 
+    @GetMapping("/invoices")
+    public ResponseEntity<List<InvoiceDTO>> getInvoices(@RequestParam int pageNum){
+        return new ResponseEntity<>(invoiceService.getAllInvoicesByPageNum(pageNum),HttpStatus.OK);
+    }
+
 
 
 }

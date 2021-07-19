@@ -8,8 +8,12 @@ import com.galvanize.invoicify.dto.InvoiceDTO;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.List;
@@ -60,6 +64,11 @@ public class InvoiceService {
         invoiceDTO.setItemDtoList(itemDToList);
         invoiceDTO.setInvoiceId(invoice.getId());
         return invoiceDTO;
+    }
+
+    public List<InvoiceDTO> getAllInvoicesByPageNum(int pageNum) {
+        Pageable p = (Pageable) PageRequest.of(pageNum,10, Sort.DEFAULT_DIRECTION);
+        return invoiceRepo.getInvoicesByPageNumber(p).stream().map(e -> e.convertToDTo()).collect(Collectors.toList());
     }
 }
 
