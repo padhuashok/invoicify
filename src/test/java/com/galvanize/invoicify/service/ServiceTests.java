@@ -119,6 +119,7 @@ public class ServiceTests {
     public void deleteExpiredAndPaidInvoice() throws Exception{
         List<Item> actualItems = itemService.saveItems(itemDtoList);
         Invoice actualInvoice = invoiceService.saveInvoice(invoice);
+
         List<InvoiceItem> invoiceItemList = invoiceItemService.saveInvoiceItem(itemList, invoice);
         Company c = new Company();
         c.setId(1L);
@@ -140,7 +141,8 @@ public class ServiceTests {
         invoiceItemList.forEach( invIt -> {
             invoiceItemIdList.add(new InvoiceItemId(invIt.getId(), invIt.getItem().getId(), invIt.getInvoice().getId()));
         });
-
+        invoice.setCreatedDate(LocalDate.now().minusYears(1));
+        invoice.setInvoiceStatus("PAID");
         when(invoiceService.getInvoiceExpiredAndPaid()).thenReturn(invoiceItemIdList);
 
         List<Long> invoiceItemIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());

@@ -154,6 +154,8 @@ public class ApiTests {
     }
     @Test
     public void deleteExpiredAndPaidInvoice() throws Exception{
+        invoice.setCreatedDate(LocalDate.now().minusYears(1));
+        invoice.setInvoiceStatus("PAID");
         List<InvoiceItemId> invoiceItemIdList= new ArrayList<>();
         invoiceItemList.forEach( invIt -> {
             invoiceItemIdList.add(new InvoiceItemId(invIt.getId(), invIt.getItem().getId(), invIt.getInvoice().getId()));
