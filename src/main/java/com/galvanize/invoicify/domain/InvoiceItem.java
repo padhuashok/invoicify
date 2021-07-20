@@ -31,8 +31,8 @@ public class InvoiceItem {
     public String toString() {
         return "InvoiceItem{" +
                 "id=" + id +
-                ", item=" + item +
-                ", invoice=" + invoice +
+                ", item.id=" + item.getId() +
+                ", invoice.id=" + invoice.getId() +
                 '}';
     }
 }

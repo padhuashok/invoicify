@@ -26,4 +26,10 @@ public class ItemService {
                 .collect(Collectors.toList());
         return itemRepository.saveAll(itemList);
     }
+
+    public void deleteByIds(List<Long> itemIds) {
+        System.out.println("delete item");
+        itemRepository.deleteAllById(itemIds);
+        System.out.println("delete item complete");
+    }
 }
