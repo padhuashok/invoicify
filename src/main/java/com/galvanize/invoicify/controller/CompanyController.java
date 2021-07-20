@@ -15,25 +15,15 @@ import javax.validation.Valid;
 @RestController
 @Validated
 public class CompanyController {
-
     CompanyService companyService;
     public CompanyController(CompanyService companyService){
         this.companyService = companyService;
     }
 
-//    @GetMapping("/company")
-//    public ResponseEntity<GeneralResponse<Company>> getCompany()
-//    {
-//        return RestUtils.buildResponse(companyService.getCompany());
-//    }
-
-
     @GetMapping("/company")
     public ResponseEntity<Iterable<Company>> getCompany(){
         return new ResponseEntity(companyService.getCompany(), HttpStatus.OK);
     }
-
-
     @PostMapping("/company")
     public ResponseEntity<GeneralResponse<Company>> createCompany(@RequestBody CompanyDTO companyDTO)
     {
@@ -43,7 +33,6 @@ public class CompanyController {
         else
             return RestUtils.buildResponse(HttpStatus.BAD_REQUEST, "ContactPhoneNumber should be 10 digit with numeric values", null);
     }
-
     @PutMapping("/company")
     public ResponseEntity<GeneralResponse<Company>> getCompany(@RequestBody CompanyDTO companyDTO)
     {

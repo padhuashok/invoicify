@@ -19,10 +19,4 @@ public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
     @Query(value = "Delete from Invoice i where i.id in(?1)", nativeQuery = true)
     void deleteInvoicesByIds(List<Long> invoiceIds);
 
-
-//    @Query("Select new com.galvanize.invoicify.dto.InvoiceItemId(i.invoiceItems.id,  i.invoiceItems.item.id, i.id) " +
-//           // "from Invoice i where year(sysdate) - year(i.createdDate)>1 and i.invoiceStatus=PAID")
-//            "from Invoice i ")
-//           // "where i.invoiceStatus=PAID")
-//    List<InvoiceItemId> getInvoiceExpiredAndPaid();
 }

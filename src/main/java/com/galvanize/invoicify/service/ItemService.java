@@ -28,8 +28,6 @@ public class ItemService {
     }
 
     public void deleteByIds(List<Long> itemIds) {
-        System.out.println("delete item");
         itemRepository.deleteAllById(itemIds);
-        System.out.println("delete item complete");
     }
 }

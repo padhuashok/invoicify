@@ -23,7 +23,6 @@ public class FlatFee extends Fee {
     }
     @Override
     public double getTotalFee(  ){
-        System.out.println("FlateFee: getTotalFee"+ amount);
 
         return amount;
     }

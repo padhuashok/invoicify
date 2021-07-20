@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @WebMvcTest
 public class ServiceTests {
@@ -72,8 +74,6 @@ public class ServiceTests {
         invoiceItemList.add(invoiceItem2);
         itemDtoList = Arrays.asList(itemdto1, itemdto2);
 
-
-
     }
     @Test
     void addItemtoInvoice() throws Exception {
@@ -106,13 +106,11 @@ public class ServiceTests {
         invoiceDTO.setInvoiceTotal(totalCost);
         invoiceDTO.setInvoiceStatus("UNPAID");
         invoiceDTO.setCreatedDate(LocalDate.now());
-        Invoice invoice = new Invoice(invoiceDTO, c);
-        when(companyService.getCompanyById(invoiceDTO.getCompanyId())).thenReturn(c);
-        when(itemService.saveItems(itemDtoList)).thenReturn(itemList);
-        when(invoiceItemService.saveInvoiceItem(itemList, invoice)).thenReturn(invoiceItemList);
-        when(invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c)).thenReturn(invoiceDTO);
-        InvoiceDTO actualInvoice = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
-        assertEquals(invoice,actualInvoice);
+        when(companyService.getCompanyById(1L)).thenReturn(c);
+        when(invoiceService.calculateTotalCostAndSetStatus(isA(InvoiceDTO.class),isA(Company.class)))
+                .thenReturn(invoiceDTO);
+        assertEquals(invoiceDTO,invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c));
+
     }
 
     @Test
@@ -151,7 +149,6 @@ public class ServiceTests {
         doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceItemIds);
         doNothing().when(itemService).deleteByIds(itemIds);
         doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceIds);
-
         invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);
         itemService.deleteByIds(itemIds);
         invoiceService.deleteByIds(invoiceIds);

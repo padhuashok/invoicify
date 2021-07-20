@@ -24,16 +24,6 @@ public class CompanyControllerTest {
     @Autowired
     private MockMvc mvc;
 
-//    @Test
-//    public void addCompany(){
-//        CompanyDTO companyDTO = new CompanyDTO();
-//        companyDTO.setId(1);
-//        companyDTO.setAddress("Texas");
-//        companyDTO.setContactName("Kieu");
-//        companyDTO.setContactTitle("ItemsPayable");
-//        companyDTO.setName("AlphaCompany");
-//        companyDTO.setContactPhoneNumber("9142362814");
-//    }
 
     @Test
     public void testGetCompany() throws Exception {

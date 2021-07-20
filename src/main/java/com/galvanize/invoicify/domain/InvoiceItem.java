@@ -1,5 +1,6 @@
 package com.galvanize.invoicify.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,8 @@ public class InvoiceItem {
     @JoinColumn(name="itemId")
     @ManyToOne
     private Item item;
-    @ManyToOne
+    @JsonIgnoreProperties(ignoreUnknown = true, value = {"invoiceItems"})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="invoiceId")
     private Invoice invoice;
     public InvoiceItem(Item item, Invoice invoice) {

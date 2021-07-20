@@ -68,17 +68,7 @@ public class InvoiceService {
         return invoiceDTO;
     }
 
-//    public void deleteAllExpiredAndPaidInvoice() {
-//
-//        Calendar cal = Calendar.getInstance();
-//        Date today = cal.getTime();
-//        cal.add(Calendar.YEAR, -1);
-//        Date expiryDate = cal.getTime();
-//        invoiceRepo.deleteAllExpiredAndPaidInvoice(expiryDate,"PAID");
-//    }
-
     public List<InvoiceItemId> getInvoiceExpiredAndPaid() {
-       // return invoiceRepo.getInvoiceExpiredAndPaid();
         List<InvoiceItem> invoiceItems =(List<InvoiceItem>) invoiceItemRepository.findAll();
 
         return invoiceItems.stream().map(invoiceItem  -> {
@@ -88,7 +78,6 @@ public class InvoiceService {
 
     public void deleteByIds(List<Long> invoiceIds) {
         invoiceRepo.deleteInvoicesByIds(invoiceIds);
-        //invoiceRepo.deleteAllById(invoiceIds);
     }
 
 

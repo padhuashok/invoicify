@@ -17,6 +17,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Setter
 @JsonIgnoreProperties(value = { "fee" })
+
 public class ItemDto {
     private String description;
     private int quantity;

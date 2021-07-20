@@ -52,11 +52,15 @@ public class InvoicifyController {
 
     @PostMapping("/invoice")
     public ResponseEntity<InvoiceDTO> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
-        List<InvoiceItem> invoiceItems = invoiceDTO.getInvoiceItems();
-       // List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
-        //call company service to check if company exists and then call invoice service
+       // List<InvoiceItem> invoiceItems = invoiceDTO.getInvoiceItems();
+        System.out.println(" IN CONTROLLER::"+invoiceDTO);
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
+        System.out.println("AFTER COMPANY CALL::"+invoiceDTO);
+        System.out.println(c);
+
         invoiceDTO= invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
+        System.out.println(" COMPLETED IN CONTROLLER::"+invoiceDTO);
+
         return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
     }
 
@@ -67,6 +71,7 @@ public class InvoicifyController {
             List<InvoiceItem>  invoiceItemList = invoiceItemService.getInvoiceExpiredAndPaid();
 
             List<InvoiceItemId> expiredList = invoiceItemList.stream().map( invIt -> new InvoiceItemId(invIt)).collect(Collectors.toList());
+
             if (!expiredList.isEmpty()) {
                 List<Long> invoiceItemIds = expiredList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
                 invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);
@@ -83,7 +88,5 @@ public class InvoicifyController {
         return RestUtils.buildResponse("SUCCESSED");
 
     }
-
-
 
 }

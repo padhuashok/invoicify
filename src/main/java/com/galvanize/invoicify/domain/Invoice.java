@@ -1,5 +1,6 @@
 package com.galvanize.invoicify.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.dto.InvoiceDTO;
 import lombok.*;
@@ -20,7 +21,8 @@ public class Invoice {
    Long id;
    @Column(unique = true)
    private int invoiceNumber;
-   @OneToMany(mappedBy = "invoice")
+
+   @OneToMany(mappedBy = "invoice", fetch = FetchType.LAZY)
    private List<InvoiceItem> invoiceItems;
    private double invoiceTotal;
    private String invoiceStatus;
@@ -30,6 +32,14 @@ public class Invoice {
    private Company company;
 
    public Invoice(InvoiceDTO d, Company c){
+      this.invoiceTotal = d.getInvoiceTotal();
+      this.createdDate = d.getCreatedDate();
+      this.invoiceStatus = d.getInvoiceStatus();
+      this.company = c;
+      this.invoiceNumber = d.getInvoiceNumber();
+      this.invoiceItems = d.getInvoiceItems();
+   }
+   public void createInvoiceFromDto(InvoiceDTO d, Company c){
       this.invoiceTotal = d.getInvoiceTotal();
       this.createdDate = d.getCreatedDate();
       this.invoiceStatus = d.getInvoiceStatus();

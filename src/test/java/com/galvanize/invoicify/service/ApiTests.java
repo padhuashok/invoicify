@@ -1,5 +1,4 @@
 package com.galvanize.invoicify.service;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.domain.Invoice;
@@ -14,7 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,10 +37,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest
 @AutoConfigureRestDocs
-
 public class ApiTests {
     @Autowired
     private MockMvc mvc;
@@ -88,11 +87,12 @@ public class ApiTests {
         invoiceItem = new InvoiceItem(item1, invoice);
         invoiceItem2 = new InvoiceItem(item2, invoice);
         invoiceItemList = Arrays.asList(invoiceItem, invoiceItem2);
-        Company c = new Company();
-        c.setContactName("Hey There");
-        c.setName("My First Company");
+        company = new Company();
+        company.setId(1L);
+        company.setContactName("Hey There");
+        company.setName("My First Company");
         invoiceDTO = new InvoiceDTO();
-//        invoiceDTO.setItemDtoList(dtoitems);
+        invoiceDTO.setItemDtoList(dtoitems);
         invoiceDTO.setCompanyId(1L);
         double totalCost = 0.0;
         for (InvoiceItem i:
@@ -104,53 +104,128 @@ public class ApiTests {
         invoiceDTO.setCreatedDate(LocalDate.now());
         invoiceDTO.setInvoiceNumber(1);
         invoiceDTO.setInvoiceItems(invoiceItemList);
-        invoice = new Invoice(invoiceDTO, c);
+        invoice.createInvoiceFromDto(invoiceDTO, company);
         invoice.setId(1L);
         invoiceDTO.setInvoiceId(1L);
     }
+
     @Test
-    void addItemtoInvoice() throws Exception{
+    void addItemtoInvoice() throws Exception {
         when(itemService.saveItems(anyList())).thenReturn(itemList);
         when(invoiceService.saveInvoice(isA(Invoice.class))).thenReturn(invoice);
-        when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
+        when(invoiceItemService.saveInvoiceItem(anyList(), isA(Invoice.class))).thenReturn(invoiceItemList);
         mvc.perform(post("/invoice/items")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(InvoicifyStringUtils.asJsonString(dtoitems)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("[0].item").value(invoiceItemList.get(0).getItem()))
-                .andExpect(jsonPath("[0].invoice").value(invoiceItemList.get(0).getInvoice()))
-                .andExpect(jsonPath("[1].item").value(invoiceItemList.get(1).getItem()))
-                .andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()))
+                .andExpect(jsonPath("[0].item.id").value(invoiceItemList.get(0).getItem().getId()))
+                .andExpect(jsonPath("[0].invoice.id").value(invoiceItemList.get(0).getInvoice().getId()))
+                .andExpect(jsonPath("[1].item.id").value(invoiceItemList.get(1).getItem().getId()))
+                .andExpect(jsonPath("[1].invoice.id").value(invoiceItemList.get(1).getInvoice().getId()))
                 .andDo((document("Add Items to Invoice POST", responseFields(
-                fieldWithPath("[]").description("One or more line items of invoice"),
-                fieldWithPath("[].id").description("Invoice Item ID"),
-                fieldWithPath("[].item.id").description("Internal ID of Items"),
-                fieldWithPath("[].item.description").description("Description of line item for invoice"),
-                fieldWithPath("[].item.quantity").description("Number of persons involved for the work"),
-                fieldWithPath("[].item.totalFee").description("Identifies the type of cost ( flat/rate based)"),
-                fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
-                fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
-                fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
-                fieldWithPath("[].invoice.company").description("Company the invoice is associated to"),
-                fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
+                        fieldWithPath("[]").description("One or more line items of invoice"),
+                        fieldWithPath("[].id").description("Invoice Item ID"),
+                        fieldWithPath("[].item.id").description("Internal ID of Items"),
+                        fieldWithPath("[].item.description").description("Description of line item for invoice"),
+                        fieldWithPath("[].item.quantity").description("Number of persons involved for the work"),
+                        fieldWithPath("[].item.totalFee").description("Identifies the type of cost ( flat/rate based)"),
+                        fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
+                        fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
+                        fieldWithPath("[].invoice.invoiceNumber").description("Invoice Number"),
+                        fieldWithPath("[].invoice.invoiceStatus").description("Description of invoice status(PAID/UNPAID)"),
+                        fieldWithPath("[].invoice.createdDate").description("Date of invoice created"),
+                        fieldWithPath("[].invoice.modifiedDate").description("Date of invoice updated"),
+                        fieldWithPath("[].invoice.company.id").description("Company the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.company.id").description("Company id the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.company.name").description("Company name the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.company.address").description("Company address the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.company.contactName").description("Company contact person name the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.company.contactTitle").description("Company contact person title the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.company.contactPhoneNumber").description("Company contact phone number the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.company.invoices").description("Company the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work not calculated yet")))));
     }
 
     @Test
     public void createInvoiceAndCalculateInvoiceTotal() throws ResourceNotFoundException, Exception {
 
+//        String invoiceDtoString ="{\n" +
+//                "    \"companyId\": 1,\n" +
+//                "    \"invoiceItems\": [\n" +
+//                "    {\n" +
+//                "        \"id\": 5,\n" +
+//                "        \"item\": {\n" +
+//                "            \"id\": 2,\n" +
+//                "            \"description\": \"dev\",\n" +
+//                "            \"quantity\": 1,\n" +
+//                "            \"totalFee\": 0.0,\n" +
+//                "            \"invoiceItems\": null\n" +
+//                "        },\n" +
+//                "        \"invoice\": {\n" +
+//                "            \"id\": 4,\n" +
+//                "            \"invoiceNumber\": 0,\n" +
+//                "            \"invoiceItems\": null,\n" +
+//                "            \"invoiceTotal\": 0.0,\n" +
+//                "            \"invoiceStatus\": \"PAID\",\n" +
+//                "            \"createdDate\": \"2019-06-17\",\n" +
+//                "            \"modifiedDate\": null,\n" +
+//                "            \"company\": null\n" +
+//                "        }\n" +
+//                "    },\n" +
+//                "    {\n" +
+//                "        \"id\": 6,\n" +
+//                "        \"item\": {\n" +
+//                "            \"id\": 3,\n" +
+//                "            \"description\": \"dev\",\n" +
+//                "            \"quantity\": 3,\n" +
+//                "            \"totalFee\": 0.0,\n" +
+//                "            \"invoiceItems\": null\n" +
+//                "        },\n" +
+//                "        \"invoice\": {\n" +
+//                "            \"id\": 4,\n" +
+//                "            \"invoiceNumber\": 0,\n" +
+//                "            \"invoiceItems\": null,\n" +
+//                "            \"invoiceTotal\": 0.0,\n" +
+//                "            \"invoiceStatus\": \"PAID\",\n" +
+//                "            \"createdDate\": \"2019-06-17\",\n" +
+//                "            \"modifiedDate\": null,\n" +
+//                "            \"company\": null\n" +
+//                "        }\n" +
+//                "    }\n" +
+//                "]\n" +
+//                "}";
         when(companyService.getCompanyById(1L)).thenReturn(company);
-        when(invoiceService.calculateTotalCostAndSetStatus(isA(InvoiceDTO.class),isA(Company.class))).thenReturn(invoiceDTO);
-        System.out.println(invoice);
+        when(invoiceService.calculateTotalCostAndSetStatus(isA(InvoiceDTO.class),isA(Company.class)))
+                .thenReturn(invoiceDTO);
 
         mvc.perform(post("/invoice")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(InvoicifyStringUtils.asJsonString(invoiceDTO)))
+                //.content(invoiceDtoString))
                 .andExpect(status().isCreated())
-                //.andExpect(jsonPath("$.").value(invoice))
                 .andExpect(jsonPath("$.invoiceId").value(1L))
                 .andExpect(jsonPath("$.invoiceStatus").value("UNPAID"))
-                .andExpect(jsonPath("$.invoiceItems[0].item").value(item1))
-                .andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()));
+                .andExpect(jsonPath("$.itemDtoList.length()").value(invoiceDTO.getItemDtoList().size()))
+                .andExpect(jsonPath("$.itemDtoList[0].description").value(invoiceDTO.getItemDtoList().get(0).getDescription()))
+                .andExpect(jsonPath("$.itemDtoList[0].quantity").value(invoiceDTO.getItemDtoList().get(0).getQuantity()))
+                .andExpect(jsonPath("$.itemDtoList[0].amount").value(invoiceDTO.getItemDtoList().get(0).getAmount()))
+                .andExpect(jsonPath("$.itemDtoList[0].totalFee").value(invoiceDTO.getItemDtoList().get(0).getTotalFee()))
+                .andExpect(jsonPath("$.companyId").value(company.getId()))
+                .andDo((document("Create Invoice POST", responseFields(
+                        fieldWithPath("invoiceId").description("Rate per person involved in the work "),
+                        fieldWithPath("invoiceNumber").description("Invoice Number"),
+                        fieldWithPath("invoiceStatus").description("Description of invoice status(PAID/UNPAID)"),
+                        fieldWithPath("createdDate").description("Date of invoice created"),
+                        fieldWithPath("modifiedDate").description("Date of invoice updated"),
+                        fieldWithPath("invoiceTotal").description(" invoice total"),
+                        fieldWithPath("modifiedDate").description("Date of invoice updated"),
+                        fieldWithPath("itemDtoList[].description").description("Description of item "),
+                        fieldWithPath("itemDtoList[].quantity").description("Quantity of item "),
+                        fieldWithPath("itemDtoList[].amount").description("Amount of item "),
+                        fieldWithPath("itemDtoList[].totalFee").description("totalFee of item list "),
+                        fieldWithPath("companyId").description("Company id associated with the invoice"),
+                        fieldWithPath("companyDTO").description("Company information")))));
+
     }
     @Test
     public void deleteExpiredAndPaidInvoice() throws Exception{

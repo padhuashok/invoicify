@@ -22,21 +22,15 @@ public class InvoiceItemService {
             invoiceItems.add(invoiceItem);
                 }
         );
-
         return invoicItemRepository.saveAll(invoiceItems);
     }
 
-
-
     public void deleteExpiredAndPaidInv(List<Long> invoiceItemIds) {
-        System.out.println("delete invoice item");
         invoicItemRepository.deleteAllById(invoiceItemIds);
-        System.out.println("complete delete invoice item");
     }
-
-
     public List<InvoiceItem> getInvoiceExpiredAndPaid() {
         LocalDate endDate =  LocalDate.now().minusYears(1);
-        return invoicItemRepository.getInvoiceExpiredAndPaid( endDate);
+       // return invoicItemRepository.getInvoiceExpiredAndPaid( endDate);
+        return invoicItemRepository.getInvoiceExpiredAndPaid();
     }
 }

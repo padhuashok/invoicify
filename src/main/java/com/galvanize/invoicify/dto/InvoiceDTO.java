@@ -1,15 +1,13 @@
 package com.galvanize.invoicify.dto;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import lombok.ToString;
 import java.time.LocalDate;
 import java.util.List;
-
+@ToString
 @Getter
 @Setter
 @NoArgsConstructor
