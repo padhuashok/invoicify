@@ -1,33 +1,22 @@
 package com.galvanize.invoicify.service;
-
 import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
+import java.util.List;
+import java.util.Optional;
 @Service
 public class CompanyService {
     @Autowired
     CompanyRepository companyRepository;
-
     public CompanyService(CompanyRepository companyRepository)
     {
         this.companyRepository = companyRepository;
     }
     public List<Company> getCompany(){
-        Iterable<Company> companyList = companyRepository.findAll();
-        Iterator<Company> iterator = companyList.iterator();
-        // Iterator -> Spliterators -> Stream -> List
-        List<Company> result = StreamSupport.stream(
-                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false)
-                .collect(Collectors.toList());
-        return result;
+        return (List<Company>) companyRepository.findAll();
     }
 
     public Company getCompanyById(Long companyId) throws ResourceNotFoundException {
@@ -47,21 +36,20 @@ public class CompanyService {
         company.setContactPhoneNumber(companyDTO.getContactPhoneNumber());
         return companyRepository.save(company);
     }
-
-    public Company add(Company company) {
-        return companyRepository.save(company);
+    public Company add(Company company) {return companyRepository.save(company);
     }
-
-    public Company updateCompany(CompanyDTO companyDTO) {
-        Company companyEntity = companyRepository.findByName(companyDTO.getName()).get();
-
+    public Company updateCompany(CompanyDTO companyDTO, Company companyEntity) {
         companyEntity.setName(companyDTO.getName());
         companyEntity.setAddress(companyDTO.getAddress());
         companyEntity.setContactName(companyDTO.getContactName());
         companyEntity.setContactTitle(companyDTO.getContactTitle());
         companyEntity.setContactPhoneNumber(companyDTO.getContactPhoneNumber());
-
         return companyRepository.save(companyEntity);
     }
-
+    public Company findByName(String name) {
+        return companyRepository.findByName(name).orElse(null);
+    }
+    public Company findById(long id) {
+        return companyRepository.findById(id).orElse(null);
+    }
 }

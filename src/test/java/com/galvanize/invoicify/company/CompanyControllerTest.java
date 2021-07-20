@@ -1,5 +1,4 @@
 package com.galvanize.invoicify.company;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.galvanize.invoicify.dto.CompanyDTO;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
@@ -25,14 +23,11 @@ public class CompanyControllerTest {
     private MockMvc mvc;
     @Autowired
     ObjectMapper objectMapper;
-
-
     @Test
     public void testGetCompany() throws Exception {
         mvc.perform(get("/company"))
                 .andExpect(status().isOk());
     }
-
     @Test
     public void testPostCompany() throws Exception {
         CompanyDTO companyDTO = new CompanyDTO(
