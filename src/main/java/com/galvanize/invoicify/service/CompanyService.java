@@ -6,8 +6,10 @@ import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class CompanyService {
@@ -19,7 +21,13 @@ public class CompanyService {
         this.companyRepository = companyRepository;
     }
     public List<Company> getCompany(){
-        return companyRepository.findAll();
+        Iterable<Company> companyList = companyRepository.findAll();
+        Iterator<Company> iterator = companyList.iterator();
+        // Iterator -> Spliterators -> Stream -> List
+        List<Company> result = StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false)
+                .collect(Collectors.toList());
+        return result;
     }
 
     public Company getCompanyById(Long companyId) throws ResourceNotFoundException {
@@ -45,7 +53,7 @@ public class CompanyService {
     }
 
     public Company updateCompany(CompanyDTO companyDTO) {
-        Company companyEntity = companyRepository.findByName(companyDTO.getName());
+        Company companyEntity = companyRepository.findByName(companyDTO.getName()).get();
 
         companyEntity.setName(companyDTO.getName());
         companyEntity.setAddress(companyDTO.getAddress());
