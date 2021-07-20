@@ -5,8 +5,11 @@ import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.repository.InvoiceItemRepository;
 import com.galvanize.invoicify.repository.InvoiceRepository;
+import com.galvanize.invoicify.utils.InvoicifyStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,17 +17,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-
 public class InvoiceService {
 
-
-    @Autowired
     InvoiceRepository invoiceRepo;
 
+    InvoiceItemRepository invoiceItemRepository;
+
+    public InvoiceService(InvoiceRepository invoiceRepo, InvoiceItemRepository invoiceItemRepo){
+        this.invoiceRepo = invoiceRepo;
+        this.invoiceItemRepository = invoiceItemRepo;
+    }
     public List<Invoice> findAllInvoices() {
         return invoiceRepo.findAll();
     }
@@ -47,14 +55,10 @@ public class InvoiceService {
         invoiceDTO.setInvoiceTotal(totalCost);
         invoiceDTO.setInvoiceStatus("UNPAID");
         invoiceDTO.setCreatedDate(LocalDate.now());
-        int invoiceNumber = invoiceRepo.getMaxInvoiceNumber().isPresent() ? invoiceRepo.getMaxInvoiceNumber().get() + 1 : 1;
+        int invoiceNumber = invoiceRepo.getMaxInvoiceNumber() + 1;
         invoiceDTO.setInvoiceNumber(invoiceNumber);
         Invoice invoice = invoiceDTO.getInvoiceItems().get(0).getInvoice();
-        invoice.convertFromDTOAndCompany(invoiceDTO,company);
-        System.out.println(invoice.getInvoiceItems().size());
-        System.out.println(invoice.getInvoiceStatus());
-        System.out.println(invoice.getInvoiceTotal());
-        System.out.println(invoice.getInvoiceNumber());
+        invoice.convertFromDTOAndCompany(invoiceDTO, company);
         invoice = saveInvoice(invoice);
         invoiceDTO =  invoice.convertToDTo();
         List<ItemDto> itemDToList =
@@ -67,6 +71,28 @@ public class InvoiceService {
         invoiceDTO.setInvoiceId(invoice.getId());
         return invoiceDTO;
     }
+
+//    public void deleteAllExpiredAndPaidInvoice() {
+//
+//        Calendar cal = Calendar.getInstance();
+//        Date today = cal.getTime();
+//        cal.add(Calendar.YEAR, -1);
+//        Date expiryDate = cal.getTime();
+//        invoiceRepo.deleteAllExpiredAndPaidInvoice(expiryDate,"PAID");
+//    }
+
+    public List<InvoiceItemId> getInvoiceExpiredAndPaid() {
+       // return invoiceRepo.getInvoiceExpiredAndPaid();
+        List<InvoiceItem> invoiceItems = invoiceItemRepository.findAll();
+
+        return invoiceItems.stream().map(invoiceItem  -> new InvoiceItemId(invoiceItem)).collect(Collectors.toList());
+    }
+
+    public void deleteByIds(List<Long> invoiceIds) {
+        invoiceRepo.deleteInvoicesByIds(invoiceIds);
+        //invoiceRepo.deleteAllById(invoiceIds);
+    }
+
 
     public List<InvoiceDTO> getAllInvoicesByPageNum(Integer pageNo) {
         System.out.println(pageNo);

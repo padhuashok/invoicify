@@ -5,17 +5,21 @@ import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.exception.ResourceNotFoundException;
+import com.galvanize.invoicify.response.GeneralResponse;
 import com.galvanize.invoicify.service.CompanyService;
 import com.galvanize.invoicify.service.InvoiceItemService;
 import com.galvanize.invoicify.service.InvoiceService;
 import com.galvanize.invoicify.service.ItemService;
+import com.galvanize.invoicify.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class InvoicifyController {
@@ -49,15 +53,40 @@ public class InvoicifyController {
     @PostMapping("/invoice")
     public ResponseEntity<InvoiceDTO> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
         List<InvoiceItem> invoiceItems = invoiceDTO.getInvoiceItems();
-        // List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
+       // List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
         //call company service to check if company exists and then call invoice service
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
-        invoiceDTO = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO, c);
-        return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED);
+        invoiceDTO= invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
+        return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
+    }
+
+    @DeleteMapping("/invoice")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<GeneralResponse<String>> deleteAllExpiredAndPaidInvoice(){
+        try {
+            List<InvoiceItem>  invoiceItemList = invoiceItemService.getInvoiceExpiredAndPaid();
+
+            List<InvoiceItemId> expiredList = invoiceItemList.stream().map( invIt -> new InvoiceItemId(invIt)).collect(Collectors.toList());
+            if (!expiredList.isEmpty()) {
+                List<Long> invoiceItemIds = expiredList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
+                invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);
+
+                List<Long> itemIds = expiredList.stream().map(ex -> ex.getItemId()).collect(Collectors.toList());
+                itemService.deleteByIds(itemIds);
+                List<Long> invoiceIds = expiredList.stream().map(ex -> ex.getInvoiceId()).collect(Collectors.toList());
+                invoiceService.deleteByIds(invoiceIds);
+            }
+        }catch (Exception e){
+            return RestUtils.buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "FAILED");
+        }
+        return RestUtils.buildResponse("SUCCESSED");
+
     }
 
     @GetMapping(value = "/invoices")
-    public ResponseEntity<List<InvoiceDTO>> getInvoices(@RequestParam(defaultValue = "0") int pageNum) {
+    public ResponseEntity<List<InvoiceDTO>> getInvoices(@RequestParam(defaultValue = "0") int pageNum) throws ResourceNotFoundException {
+        if(invoiceService.getAllInvoicesByPageNum(pageNum).isEmpty())
+            throw new ResourceNotFoundException("No data available");
         return new ResponseEntity<>(invoiceService.getAllInvoicesByPageNum(pageNum), HttpStatus.OK);
     }
 

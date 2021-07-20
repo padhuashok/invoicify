@@ -16,5 +16,4 @@ public class Fee {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-
 }

@@ -2,6 +2,7 @@ package com.galvanize.invoicify.service;
 
 import com.galvanize.invoicify.domain.*;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +16,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @WebMvcTest
 public class ServiceTests {
@@ -30,7 +30,7 @@ public class ServiceTests {
     InvoiceService invoiceService;
 
     @MockBean
-    ItemService itemservice;
+    ItemService itemService;
 
     @MockBean
     InvoiceItemService invoiceItemService;
@@ -77,8 +77,8 @@ public class ServiceTests {
     }
     @Test
     void addItemtoInvoice() throws Exception {
-        when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
-        List<Item> actualItems = itemservice.saveItems(itemDtoList);
+        when(itemService.saveItems(itemDtoList)).thenReturn(itemList);
+        List<Item> actualItems = itemService.saveItems(itemDtoList);
         assertEquals(itemList, actualItems);
         when(invoiceService.saveInvoice(invoice)).thenReturn(invoice);
         Invoice actualInvoice = invoiceService.saveInvoice(invoice);
@@ -98,7 +98,6 @@ public class ServiceTests {
         InvoiceDTO invoiceDTO = new InvoiceDTO();
         invoiceDTO.setInvoiceItems(invoiceItemList);
         invoiceDTO.setCompanyId(1L);
-        invoiceDTO.setCompanyName(c.getName());
         double totalCost = 0.0;
         for (InvoiceItem i:
                 invoiceItemList) {
@@ -109,10 +108,61 @@ public class ServiceTests {
         invoiceDTO.setCreatedDate(LocalDate.now());
         Invoice invoice = new Invoice(invoiceDTO, c);
         when(companyService.getCompanyById(invoiceDTO.getCompanyId())).thenReturn(c);
-        when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
+        when(itemService.saveItems(itemDtoList)).thenReturn(itemList);
         when(invoiceItemService.saveInvoiceItem(itemList, invoice)).thenReturn(invoiceItemList);
         when(invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c)).thenReturn(invoiceDTO);
         InvoiceDTO actualInvoice = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
         assertEquals(invoice,actualInvoice);
+    }
+
+    @Test
+    public void deleteExpiredAndPaidInvoice() throws Exception{
+        List<Item> actualItems = itemService.saveItems(itemDtoList);
+        Invoice actualInvoice = invoiceService.saveInvoice(invoice);
+
+        List<InvoiceItem> invoiceItemList = invoiceItemService.saveInvoiceItem(itemList, invoice);
+        Company c = new Company();
+        c.setId(1L);
+        c.setContactName("Hey There");
+        c.setName("My First Company");
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setInvoiceItems(invoiceItemList);
+        invoiceDTO.setCompanyId(1L);
+        double totalCost = 0.0;
+        for (InvoiceItem i:
+                invoiceItemList) {
+            totalCost += i.getItem().getTotalFee();
+        }
+        invoiceDTO.setInvoiceTotal(totalCost);
+        invoiceDTO.setInvoiceStatus("UNPAID");
+        invoiceDTO.setCreatedDate(LocalDate.now());
+        Invoice invoice = new Invoice(invoiceDTO, c);
+        List<InvoiceItemId> invoiceItemIdList= new ArrayList<>();
+        invoiceItemList.forEach( invIt -> {
+            invoiceItemIdList.add(new InvoiceItemId(invIt.getId(), invIt.getItem().getId(), invIt.getInvoice().getId()));
+        });
+        invoice.setCreatedDate(LocalDate.now().minusYears(1));
+        invoice.setInvoiceStatus("PAID");
+        when(invoiceService.getInvoiceExpiredAndPaid()).thenReturn(invoiceItemIdList);
+
+        List<Long> invoiceItemIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
+        List<Long> itemIds = invoiceItemIdList.stream().map(ex -> ex.getItemId()).collect(Collectors.toList());
+        List<Long> invoiceIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceId()).collect(Collectors.toList());
+        doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceItemIds);
+        doNothing().when(itemService).deleteByIds(itemIds);
+        doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceIds);
+
+        invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);
+        itemService.deleteByIds(itemIds);
+        invoiceService.deleteByIds(invoiceIds);
+    }
+
+    @Test
+    void getListOfInvoices() throws Exception{
+        List<Invoice> invoices = new ArrayList<>();
+        for(int i=0;i<15;i++){
+            Invoice in = new Invoice();
+            in.setId((1L+i));
+        }
     }
 }

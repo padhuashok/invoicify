@@ -1,6 +1,7 @@
 package com.galvanize.invoicify.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.galvanize.invoicify.domain.Company;
 import com.sun.istack.NotNull;
 import lombok.*;
@@ -12,6 +13,7 @@ import javax.validation.constraints.Pattern;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CompanyDTO {
     private long id;
     @NotNull
@@ -27,6 +29,7 @@ public class CompanyDTO {
     private String contactPhoneNumber;
 
     public CompanyDTO(Company company){
+        this.id = company.getId();
         this.address = company.getAddress();
         this.contactName = company.getContactName();
         this.contactTitle = company.getContactTitle();

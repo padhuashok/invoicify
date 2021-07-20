@@ -2,10 +2,12 @@ package com.galvanize.invoicify.domain;
 
 import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.ItemDto;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -45,11 +47,17 @@ public class Invoice {
 
    public InvoiceDTO convertToDTo() {
       InvoiceDTO invoiceDTo = new InvoiceDTO();
+      invoiceDTo.setInvoiceId(this.id);
       invoiceDTo.setInvoiceTotal( this.getInvoiceTotal());
       invoiceDTo.setCreatedDate(this.getCreatedDate());
       invoiceDTo.setInvoiceStatus(this.getInvoiceStatus());
       invoiceDTo.setInvoiceNumber(this.getInvoiceNumber());
       invoiceDTo.setInvoiceItems(this.getInvoiceItems());
+      List<ItemDto> itemDtoList = new ArrayList<>();
+      for (InvoiceItem i: this.getInvoiceItems())
+         if (i.getItem() != null)
+            itemDtoList.add(new ItemDto(i.getItem()));
+      invoiceDTo.setItemDtoList(itemDtoList);
       CompanyDTO companyDTO =  new CompanyDTO(this.company);
       invoiceDTo.setCompanyDTO(companyDTO);
       return invoiceDTo;

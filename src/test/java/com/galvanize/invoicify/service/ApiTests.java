@@ -6,6 +6,7 @@ import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.utils.InvoicifyStringUtils;
@@ -15,20 +16,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,7 +51,7 @@ public class ApiTests {
     InvoiceService invoiceService;
 
     @MockBean
-    ItemService itemservice;
+    ItemService itemService;
 
     @MockBean
     InvoiceItemService invoiceItemService;
@@ -106,7 +110,7 @@ public class ApiTests {
     }
     @Test
     void addItemtoInvoice() throws Exception{
-        when(itemservice.saveItems(anyList())).thenReturn(itemList);
+        when(itemService.saveItems(anyList())).thenReturn(itemList);
         when(invoiceService.saveInvoice(isA(Invoice.class))).thenReturn(invoice);
         when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
         mvc.perform(post("/invoice/items")
@@ -147,5 +151,32 @@ public class ApiTests {
                 .andExpect(jsonPath("$.invoiceStatus").value("UNPAID"))
                 .andExpect(jsonPath("$.invoiceItems[0].item").value(item1))
                 .andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()));
+    }
+    @Test
+    public void deleteExpiredAndPaidInvoice() throws Exception{
+        invoice.setCreatedDate(LocalDate.now().minusYears(1));
+        invoice.setInvoiceStatus("PAID");
+        List<InvoiceItemId> invoiceItemIdList= new ArrayList<>();
+        invoiceItemList.forEach( invIt -> {
+            invoiceItemIdList.add(new InvoiceItemId(invIt.getId(), invIt.getItem().getId(), invIt.getInvoice().getId()));
+        });
+
+
+        List<Long> invoiceItemIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
+        List<Long> itemIds = invoiceItemIdList.stream().map(ex -> ex.getItemId()).collect(Collectors.toList());
+        List<Long> invoiceIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceId()).collect(Collectors.toList());
+        doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceItemIds);
+        doNothing().when(itemService).deleteByIds(itemIds);
+        doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceIds);
+        mvc.perform(delete("/invoice"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(HttpStatus.OK.name()))
+                .andExpect(jsonPath("$.data").value("SUCCESSED"))
+                .andDo((document("Delete Expired and Paid Invoice DELETE",responseFields(
+                        fieldWithPath("status").description("Response Status"),
+                        fieldWithPath("message").description("Response Message"),
+                        fieldWithPath("data").description("Response Data")))));
+
     }
 }
