@@ -15,7 +15,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
@@ -92,6 +94,11 @@ public class InvoiceService {
         System.out.println(pageNo);
         Pageable p = PageRequest.of(pageNo, 10, Sort.by(Sort.Direction.ASC, "CreatedDate"));
         return invoiceRepo.findAll(p).stream().map(e -> e.convertToDTo()).collect(Collectors.toList());
+    }
+    public Invoice findUnpaidInvoiceByInvoiceNumber(int invoiceNumber) throws ResourceNotFoundException {
+        return invoiceRepo.findUnpaidInvoiceByInvoiceNumber(invoiceNumber)
+                .orElseThrow( () -> new ResourceNotFoundException("Cannot find UNPAID invoice with invoice number "+ invoiceNumber)
+                );
     }
 }
 
