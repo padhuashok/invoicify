@@ -11,6 +11,9 @@ import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.InvoiceItemRepository;
 import com.galvanize.invoicify.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -85,7 +88,11 @@ public class InvoiceService {
         return  invoiceRepo.findByInvoiceNumber(invoiceNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice number"+ invoiceNumber+" not found"));
     }
-
+    public List<InvoiceDTO> getAllInvoicesByPageNum(Integer pageNo) {
+        System.out.println(pageNo);
+        Pageable p = PageRequest.of(pageNo, 10, Sort.by(Sort.Direction.ASC, "CreatedDate"));
+        return invoiceRepo.findAll(p).stream().map(e -> e.convertToDTo()).collect(Collectors.toList());
+    }
 }
 
 

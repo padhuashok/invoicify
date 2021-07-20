@@ -93,4 +93,11 @@ public class InvoicifyController {
         }
     }
 
+    @GetMapping(value = "/invoices")
+    public ResponseEntity<List<InvoiceDTO>> getInvoices(@RequestParam(defaultValue = "0") int pageNum) throws ResourceNotFoundException {
+        if(invoiceService.getAllInvoicesByPageNum(pageNum).isEmpty())
+            throw new ResourceNotFoundException("No data available");
+        return new ResponseEntity<>(invoiceService.getAllInvoicesByPageNum(pageNum), HttpStatus.OK);
+    }
+
 }

@@ -175,9 +175,7 @@ public class ServiceTests {
         invoice.setId(1L);
         invoice.setInvoiceNumber(invoiceNumber);
         when(invoiceService.getInvoiceByInvoiceNumber(invoiceNumber)).thenReturn(invoice);
-
         Invoice actualInvoice = invoiceService.getInvoiceByInvoiceNumber(invoiceNumber);
-        System.out.println(actualInvoice);
         assertEquals(invoice, actualInvoice);
     }
 }
