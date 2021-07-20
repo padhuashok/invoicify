@@ -52,15 +52,8 @@ public class InvoicifyController {
 
     @PostMapping("/invoice")
     public ResponseEntity<InvoiceDTO> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
-       // List<InvoiceItem> invoiceItems = invoiceDTO.getInvoiceItems();
-        System.out.println(" IN CONTROLLER::"+invoiceDTO);
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
-        System.out.println("AFTER COMPANY CALL::"+invoiceDTO);
-        System.out.println(c);
-
         invoiceDTO= invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
-        System.out.println(" COMPLETED IN CONTROLLER::"+invoiceDTO);
-
         return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
     }
 
@@ -85,7 +78,7 @@ public class InvoicifyController {
             System.out.println(e);
             return RestUtils.buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "FAILED");
         }
-        return RestUtils.buildResponse("SUCCESSED");
+        return RestUtils.buildResponse("SUCCEEDED");
 
     }
 

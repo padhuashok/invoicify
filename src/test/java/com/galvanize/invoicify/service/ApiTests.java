@@ -148,60 +148,12 @@ public class ApiTests {
 
     @Test
     public void createInvoiceAndCalculateInvoiceTotal() throws ResourceNotFoundException, Exception {
-
-//        String invoiceDtoString ="{\n" +
-//                "    \"companyId\": 1,\n" +
-//                "    \"invoiceItems\": [\n" +
-//                "    {\n" +
-//                "        \"id\": 5,\n" +
-//                "        \"item\": {\n" +
-//                "            \"id\": 2,\n" +
-//                "            \"description\": \"dev\",\n" +
-//                "            \"quantity\": 1,\n" +
-//                "            \"totalFee\": 0.0,\n" +
-//                "            \"invoiceItems\": null\n" +
-//                "        },\n" +
-//                "        \"invoice\": {\n" +
-//                "            \"id\": 4,\n" +
-//                "            \"invoiceNumber\": 0,\n" +
-//                "            \"invoiceItems\": null,\n" +
-//                "            \"invoiceTotal\": 0.0,\n" +
-//                "            \"invoiceStatus\": \"PAID\",\n" +
-//                "            \"createdDate\": \"2019-06-17\",\n" +
-//                "            \"modifiedDate\": null,\n" +
-//                "            \"company\": null\n" +
-//                "        }\n" +
-//                "    },\n" +
-//                "    {\n" +
-//                "        \"id\": 6,\n" +
-//                "        \"item\": {\n" +
-//                "            \"id\": 3,\n" +
-//                "            \"description\": \"dev\",\n" +
-//                "            \"quantity\": 3,\n" +
-//                "            \"totalFee\": 0.0,\n" +
-//                "            \"invoiceItems\": null\n" +
-//                "        },\n" +
-//                "        \"invoice\": {\n" +
-//                "            \"id\": 4,\n" +
-//                "            \"invoiceNumber\": 0,\n" +
-//                "            \"invoiceItems\": null,\n" +
-//                "            \"invoiceTotal\": 0.0,\n" +
-//                "            \"invoiceStatus\": \"PAID\",\n" +
-//                "            \"createdDate\": \"2019-06-17\",\n" +
-//                "            \"modifiedDate\": null,\n" +
-//                "            \"company\": null\n" +
-//                "        }\n" +
-//                "    }\n" +
-//                "]\n" +
-//                "}";
         when(companyService.getCompanyById(1L)).thenReturn(company);
         when(invoiceService.calculateTotalCostAndSetStatus(isA(InvoiceDTO.class),isA(Company.class)))
                 .thenReturn(invoiceDTO);
-
         mvc.perform(post("/invoice")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(InvoicifyStringUtils.asJsonString(invoiceDTO)))
-                //.content(invoiceDtoString))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.invoiceId").value(1L))
                 .andExpect(jsonPath("$.invoiceStatus").value("UNPAID"))
@@ -247,7 +199,7 @@ public class ApiTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
                 .andExpect(jsonPath("$.message").value(HttpStatus.OK.name()))
-                .andExpect(jsonPath("$.data").value("SUCCESSED"))
+                .andExpect(jsonPath("$.data").value("SUCCEEDED"))
                 .andDo((document("Delete Expired and Paid Invoice DELETE",responseFields(
                         fieldWithPath("status").description("Response Status"),
                         fieldWithPath("message").description("Response Message"),

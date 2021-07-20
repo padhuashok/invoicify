@@ -15,9 +15,9 @@ public interface InvoiceItemRepository extends JpaRepository<InvoiceItem,Long> {
 
     @Query(value="select * from InvoiceItem ii,Invoice i " +
             "where ii.invoiceId=i.id and i.invoiceStatus='PAID' and  ((Year(Now())-Year(i.createdDate)>1))",nativeQuery = true)
-    List<InvoiceItem> getInvoiceExpiredAndPaid();
+    List<InvoiceItem> getInvoiceExpiredAndPaid1();
 
-//    @Query("select i  from InvoiceItem i where i.invoice.createdDate < ?1 and i.invoice.invoiceStatus='PAID'")
-//    List<InvoiceItem> getInvoiceExpiredAndPaid( LocalDate endDate);
+    @Query("select i  from InvoiceItem i where i.invoice.createdDate < ?1 and i.invoice.invoiceStatus='PAID'")
+    List<InvoiceItem> getInvoiceExpiredAndPaid( LocalDate endDate);
 
 }

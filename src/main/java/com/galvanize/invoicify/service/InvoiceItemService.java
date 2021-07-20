@@ -30,7 +30,7 @@ public class InvoiceItemService {
     }
     public List<InvoiceItem> getInvoiceExpiredAndPaid() {
         LocalDate endDate =  LocalDate.now().minusYears(1);
-       // return invoicItemRepository.getInvoiceExpiredAndPaid( endDate);
-        return invoicItemRepository.getInvoiceExpiredAndPaid();
+        return invoicItemRepository.getInvoiceExpiredAndPaid(endDate);
+        //return invoicItemRepository.getInvoiceExpiredAndPaid();
     }
 }

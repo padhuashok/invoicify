@@ -20,10 +20,8 @@ public class InvoiceItemId {
         this.invoiceId = invoiceId;
     }
     public InvoiceItemId(InvoiceItem invoiceItem){
-        System.out.println(invoiceItem);
         this.setInvoiceItemId(invoiceItem.getId());
         this.setInvoiceId(invoiceItem.getInvoice().getId());
         this.setItemId(invoiceItem.getItem().getId());
-        System.out.println(this.toString());
     }
 }

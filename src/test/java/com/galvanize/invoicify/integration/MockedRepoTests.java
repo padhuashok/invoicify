@@ -84,8 +84,12 @@ public class MockedRepoTests{
                         fieldWithPath("[].item.totalFee").description("Identifies the type of cost ( flat/rate based)"),
                         fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
                         fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
-                        fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
-                        fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
+                        fieldWithPath("[].invoice.invoiceNumber").description("Invoice Number"),
+                        fieldWithPath("[].invoice.invoiceStatus").description("Description of invoice status(PAID/UNPAID)"),
+                        fieldWithPath("[].invoice.createdDate").description("Date of invoice created"),
+                        fieldWithPath("[].invoice.modifiedDate").description("Date of invoice updated"),
+                        fieldWithPath("[].invoice.company").description("Company the invoice is not associated yet"),
+                        fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work not calculated yet")))));
     }
 
 }
