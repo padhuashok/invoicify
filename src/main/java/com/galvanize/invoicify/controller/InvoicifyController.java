@@ -17,7 +17,6 @@ import com.galvanize.invoicify.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,41 +51,27 @@ public class InvoicifyController {
 
     @PostMapping("/invoice")
     public ResponseEntity<InvoiceDTO> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
-       // List<InvoiceItem> invoiceItems = invoiceDTO.getInvoiceItems();
-        System.out.println(" IN CONTROLLER::"+invoiceDTO);
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
-        System.out.println("AFTER COMPANY CALL::"+invoiceDTO);
-        System.out.println(c);
-
         invoiceDTO= invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
-        System.out.println(" COMPLETED IN CONTROLLER::"+invoiceDTO);
-
         return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
     }
 
     @DeleteMapping("/invoice")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GeneralResponse<String>> deleteAllExpiredAndPaidInvoice(){
-        try {
             List<InvoiceItem>  invoiceItemList = invoiceItemService.getInvoiceExpiredAndPaid();
-
             List<InvoiceItemId> expiredList = invoiceItemList.stream().map( invIt -> new InvoiceItemId(invIt)).collect(Collectors.toList());
-
             if (!expiredList.isEmpty()) {
                 List<Long> invoiceItemIds = expiredList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
                 invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);
-
                 List<Long> itemIds = expiredList.stream().map(ex -> ex.getItemId()).collect(Collectors.toList());
                 itemService.deleteByIds(itemIds);
                 List<Long> invoiceIds = expiredList.stream().map(ex -> ex.getInvoiceId()).collect(Collectors.toList());
                 invoiceService.deleteByIds(invoiceIds);
+                return RestUtils.buildResponse("SUCCESSED");
             }
-        }catch (Exception e){
-            System.out.println(e);
-            return RestUtils.buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "FAILED");
+            return RestUtils.buildResponse(HttpStatus.NOT_FOUND, "There is no PAID and EXPIRED Invoice", "NOT_FOUND");
         }
-        return RestUtils.buildResponse("SUCCESSED");
 
-    }
 
 }
