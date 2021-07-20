@@ -9,13 +9,11 @@ import com.galvanize.invoicify.dto.ItemDto;
 import com.galvanize.invoicify.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,10 +47,14 @@ public class InvoiceService {
         invoiceDTO.setInvoiceTotal(totalCost);
         invoiceDTO.setInvoiceStatus("UNPAID");
         invoiceDTO.setCreatedDate(LocalDate.now());
-        int invoiceNumber = invoiceRepo.getMaxInvoiceNumber() + 1;
+        int invoiceNumber = invoiceRepo.getMaxInvoiceNumber().isPresent() ? invoiceRepo.getMaxInvoiceNumber().get() + 1 : 1;
         invoiceDTO.setInvoiceNumber(invoiceNumber);
         Invoice invoice = invoiceDTO.getInvoiceItems().get(0).getInvoice();
-        invoice.convertFromDTOAndCompany(invoiceDTO, company);
+        invoice.convertFromDTOAndCompany(invoiceDTO,company);
+        System.out.println(invoice.getInvoiceItems().size());
+        System.out.println(invoice.getInvoiceStatus());
+        System.out.println(invoice.getInvoiceTotal());
+        System.out.println(invoice.getInvoiceNumber());
         invoice = saveInvoice(invoice);
         invoiceDTO =  invoice.convertToDTo();
         List<ItemDto> itemDToList =
@@ -66,9 +68,10 @@ public class InvoiceService {
         return invoiceDTO;
     }
 
-    public List<InvoiceDTO> getAllInvoicesByPageNum(int pageNum) {
-        Pageable p = (Pageable) PageRequest.of(pageNum,10, Sort.DEFAULT_DIRECTION);
-        return invoiceRepo.getInvoicesByPageNumber(p).stream().map(e -> e.convertToDTo()).collect(Collectors.toList());
+    public List<InvoiceDTO> getAllInvoicesByPageNum(Integer pageNo) {
+        System.out.println(pageNo);
+        Pageable p = PageRequest.of(pageNo,10, Sort.by(Sort.Direction.ASC,"CreatedDate"));
+        return invoiceRepo.findAll(p).stream().map(e -> e.convertToDTo()).collect(Collectors.toList());
     }
 }
 

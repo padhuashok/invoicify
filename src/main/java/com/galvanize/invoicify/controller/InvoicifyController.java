@@ -49,18 +49,17 @@ public class InvoicifyController {
     @PostMapping("/invoice")
     public ResponseEntity<InvoiceDTO> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
         List<InvoiceItem> invoiceItems = invoiceDTO.getInvoiceItems();
-       // List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
+        // List<InvoiceItem> invoiceItems = addItemToInvoice(invoiceDTO.getItemDtoList()).getBody();
         //call company service to check if company exists and then call invoice service
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
-        invoiceDTO= invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
-        return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
+        invoiceDTO = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO, c);
+        return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping("/invoices")
-    public ResponseEntity<List<InvoiceDTO>> getInvoices(@RequestParam int pageNum){
-        return new ResponseEntity<>(invoiceService.getAllInvoicesByPageNum(pageNum),HttpStatus.OK);
+    @GetMapping(value = "/invoices")
+    public ResponseEntity<List<InvoiceDTO>> getInvoices(@RequestParam(defaultValue = "0") int pageNum) {
+        return new ResponseEntity<>(invoiceService.getAllInvoicesByPageNum(pageNum), HttpStatus.OK);
     }
-
 
 
 }
