@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
     @Query("Select max(i.invoiceNumber) from Invoice i")
@@ -18,5 +19,8 @@ public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
     @Modifying
     @Query(value = "Delete from Invoice i where i.id in(?1)", nativeQuery = true)
     void deleteInvoicesByIds(List<Long> invoiceIds);
+
+    @Query("Select i from Invoice i where i.invoiceNumber=?1")
+    Optional<Invoice> findByInvoiceNumber(int invoiceNumber);
 
 }

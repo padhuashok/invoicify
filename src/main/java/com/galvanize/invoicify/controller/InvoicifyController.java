@@ -53,17 +53,17 @@ public class InvoicifyController {
     @PostMapping("/invoice")
     public ResponseEntity<InvoiceDTO> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
         Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
-        invoiceDTO= invoiceService.calculateTotalCostAndSetStatus(invoiceDTO,c);
-        return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED) ;
+        invoiceDTO = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO, c);
+        return new ResponseEntity<>(invoiceDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/invoice")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<GeneralResponse<String>> deleteAllExpiredAndPaidInvoice(){
+    public ResponseEntity<GeneralResponse<String>> deleteAllExpiredAndPaidInvoice() {
         try {
-            List<InvoiceItem>  invoiceItemList = invoiceItemService.getInvoiceExpiredAndPaid();
+            List<InvoiceItem> invoiceItemList = invoiceItemService.getInvoiceExpiredAndPaid();
 
-            List<InvoiceItemId> expiredList = invoiceItemList.stream().map( invIt -> new InvoiceItemId(invIt)).collect(Collectors.toList());
+            List<InvoiceItemId> expiredList = invoiceItemList.stream().map(invIt -> new InvoiceItemId(invIt)).collect(Collectors.toList());
 
             if (!expiredList.isEmpty()) {
                 List<Long> invoiceItemIds = expiredList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
@@ -74,12 +74,23 @@ public class InvoicifyController {
                 List<Long> invoiceIds = expiredList.stream().map(ex -> ex.getInvoiceId()).collect(Collectors.toList());
                 invoiceService.deleteByIds(invoiceIds);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
             return RestUtils.buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "FAILED");
         }
         return RestUtils.buildResponse("SUCCEEDED");
 
+    }
+
+    @GetMapping("/invoice/{invoiceNumber}")
+    public ResponseEntity<GeneralResponse<Invoice>> searchInvoiceByInvNumber(@PathVariable int invoiceNumber) throws ResourceNotFoundException {
+        try {
+            Invoice invoice = invoiceService.getInvoiceByInvoiceNumber(invoiceNumber);
+            return RestUtils.buildResponse(invoice);
+        } catch (ResourceNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return RestUtils.buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), null);
+        }
     }
 
 }

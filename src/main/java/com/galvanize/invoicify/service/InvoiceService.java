@@ -7,6 +7,7 @@ import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.dto.InvoiceDTO;
 import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.InvoiceItemRepository;
 import com.galvanize.invoicify.repository.InvoiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,10 @@ public class InvoiceService {
         invoiceRepo.deleteInvoicesByIds(invoiceIds);
     }
 
+    public Invoice getInvoiceByInvoiceNumber(int invoiceNumber) throws ResourceNotFoundException {
+        return  invoiceRepo.findByInvoiceNumber(invoiceNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice number"+ invoiceNumber+" not found"));
+    }
 
 }
 

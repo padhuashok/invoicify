@@ -37,6 +37,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 @WebMvcTest
 @AutoConfigureRestDocs
 public class ApiTests {
@@ -204,6 +206,75 @@ public class ApiTests {
                         fieldWithPath("status").description("Response Status"),
                         fieldWithPath("message").description("Response Message"),
                         fieldWithPath("data").description("Response Data")))));
+
+    }
+    @Test
+    public void searchInvoiceByInvalidInvoiceNumber() throws ResourceNotFoundException, Exception {
+        int invoiceNumber = 1;
+        when(invoiceService.getInvoiceByInvoiceNumber(invoiceNumber)).thenThrow( new ResourceNotFoundException("Invoice number"+ invoiceNumber+" not found"));
+        mvc.perform(get("/invoice/{invoiceNumber}", invoiceNumber))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.message").value("Invoice number"+ invoiceNumber+" not found"))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+    }
+
+    @Test
+    public void searchInvoiceByInvoiceNumber() throws ResourceNotFoundException, Exception {
+        int invoiceNumber = 1;
+        invoice.getCompany().setId(1L);
+        invoice.setId(1L);
+        invoice.setInvoiceNumber(invoiceNumber);
+        when(invoiceService.getInvoiceByInvoiceNumber(invoiceNumber)).thenReturn(invoice);
+        System.out.println(invoice);
+        mvc.perform(get("/invoice/{invoiceNumber}", invoiceNumber))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value(HttpStatus.OK.value()))
+                .andExpect(jsonPath("$.message").value(HttpStatus.OK.name()))
+                .andExpect(jsonPath("$.data.id").value(invoice.getId()))
+                .andExpect(jsonPath("$.data.invoiceNumber").value(invoice.getInvoiceNumber()))
+                //.andExpect(jsonPath("$.invoiceItems").value(invoiceItemList))
+                .andExpect(jsonPath("$.data.invoiceTotal").value(invoice.getInvoiceTotal()))
+                .andExpect(jsonPath("$.data.invoiceStatus").value(invoice.getInvoiceStatus()))
+                .andExpect(jsonPath("$.data.createdDate").value(invoice.getCreatedDate().toString()))
+                .andDo((document("Search Invoice GET", responseFields(
+                        fieldWithPath("status").description("Response status"),
+                        fieldWithPath("message").description("Response message"),
+                        fieldWithPath("data.id").description("Invoice ID"),
+                        fieldWithPath("data.invoiceTotal").description("Invoice Total"),
+                        fieldWithPath("data.invoiceStatus").description("Invoice Status"),
+                        fieldWithPath("data.createdDate").description("Create date of invoice"),
+                        fieldWithPath("data.modifiedDate").description("Modified Date"),
+                        fieldWithPath("data.company.id").description("Company id"),
+                        fieldWithPath("data.company.name").description("Company name"),
+                        fieldWithPath("data.company.address").description("Company address"),
+                        fieldWithPath("data.company.contactName").description("Company contact Name"),
+                        fieldWithPath("data.company.contactTitle").description("Company contactTitle"),
+                        fieldWithPath("data.company.contactPhoneNumber").description("Company contactPhoneNumber"),
+                        fieldWithPath("data.company.invoices").description("Company invoices"),
+                        fieldWithPath("data.invoiceNumber").description("Invoice number is uniques for each invoice"),
+                        fieldWithPath("data.invoiceItems[].id").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceItems[].invoice").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceItems[].invoice.invoiceNumber").description("Description of line item for invoice"),
+                        //fieldWithPath("data.invoiceItems.item").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceItems[].item.id").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceItems[].item.description").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceItems[].item.quantity").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceItems[].item.totalFee").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceItems[].item.invoiceItems").description("Description of line item for invoice"),
+                        fieldWithPath("data.invoiceItems[].invoice.invoiceStatus").description("Invoice can have unpaid, paid status"),
+                        fieldWithPath("data.invoiceItems[].invoice.id").description("System generated unique id"),
+                        fieldWithPath("data.invoiceItems[].invoice.invoiceTotal").description("Invoice Total"),
+                        fieldWithPath("data.invoiceItems[].invoice.createdDate").description("Create date of invoice"),
+                        fieldWithPath("data.invoiceItems[].invoice.modifiedDate").description("Modified Date"),
+                        fieldWithPath("data.invoiceItems[].invoice.company.id").description("Company id"),
+                        fieldWithPath("data.invoiceItems[].invoice.company.name").description("Company name"),
+                        fieldWithPath("data.invoiceItems[].invoice.company.address").description("Company address"),
+                        fieldWithPath("data.invoiceItems[].invoice.company.contactName").description("Company contact Name"),
+                        fieldWithPath("data.invoiceItems[].invoice.company.contactTitle").description("Company contactTitle"),
+                        fieldWithPath("data.invoiceItems[].invoice.company.contactPhoneNumber").description("Company contactPhoneNumber"),
+                        fieldWithPath("data.invoiceItems[].invoice.company.invoices").description("Company invoices")))));
 
     }
 }
