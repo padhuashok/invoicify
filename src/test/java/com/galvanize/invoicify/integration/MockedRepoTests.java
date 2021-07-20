@@ -85,7 +85,13 @@ public class MockedRepoTests{
                         fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
                         fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
                         fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
-                        fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
+                        fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work "),
+                        fieldWithPath("[].invoice.invoiceNumber").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.invoiceStatus").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.createdDate").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.modifiedDate").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.company").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.company").description("Amount for each person involved")))));
     }
 
 }

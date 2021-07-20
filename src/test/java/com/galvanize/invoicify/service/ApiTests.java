@@ -126,11 +126,17 @@ public class ApiTests {
                 fieldWithPath("[].item.totalFee").description("Identifies the type of cost ( flat/rate based)"),
                 fieldWithPath("[].item.invoiceItems").description("Flat fee Amount charged for an item "),
                 fieldWithPath("[].invoice.id").description("Rate per person involved in the work "),
-                fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
-                fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work ")))));
+                        fieldWithPath("[].invoice.invoiceItems").description("Amount for each person involved"),
+                fieldWithPath("[].invoice.invoiceNumber").description("Amount for each person involved"),
+                fieldWithPath("[].invoice.invoiceTotal").description("Rate per person involved in the work "),
+                        fieldWithPath("[].invoice.invoiceStatus").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.createdDate").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.modifiedDate").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.company").description("Amount for each person involved"),
+                        fieldWithPath("[].invoice.company").description("Amount for each person involved")))));
     }
 
-    @Test
+  /*  @Test
     public void createInvoiceAndCalculateInvoiceTotal() throws ResourceNotFoundException, Exception {
         when(itemservice.saveItems(anyList())).thenReturn(itemList);
         when(invoiceItemService.saveInvoiceItem(anyList(),isA(Invoice.class))).thenReturn(invoiceItemList);
@@ -144,7 +150,7 @@ public class ApiTests {
 //                .andExpect(jsonPath("$.invoiceStatus").value("UNPAID"))
 //                .andExpect(jsonPath("$.invoiceItems[0].item").value(item1));
 //                //.andExpect(jsonPath("[1].invoice").value(invoiceItemList.get(1).getInvoice()));
-    }
+    }*/
 
     @Test
     public void searchInvoiceByInvalidInvoiceNumber() throws ResourceNotFoundException, Exception {
