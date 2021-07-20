@@ -32,6 +32,9 @@ It runs in a containerized enviroment and used Postgres as DB.
 Before starting the build, Copy dos2unix file to root folder 
 once copied, issue following command
 dos2unix gradlew
+Here is end point used by Heroku  for application healthcheck
+https://invoicifyalpha.herokuapp.com/healthcheck
+
 
 ##**EndPoints**
 
@@ -40,3 +43,13 @@ GET Company endpoint: "/company"
 POST Company endpoint: "/company"
 
 PUT Company endpoint: "/company/{id}"
+
+GET HealthCheck endpoint: "/healthcheck"
+
+POST InvoiceItems endpoint: "/invoice/items"
+
+POST Invoice endpoint: "/invoice"
+
+DELETE Invoice endpoint: "/invoice"
+
+GET Invoice By Invoice Number endpoint: "/invoice/{invoiceNumber}"
