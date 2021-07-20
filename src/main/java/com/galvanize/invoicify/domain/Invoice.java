@@ -3,18 +3,17 @@ package com.galvanize.invoicify.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.galvanize.invoicify.dto.CompanyDTO;
 import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.ItemDto;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
 @Entity
-@EqualsAndHashCode
-@ToString
 public class Invoice {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
@@ -60,6 +59,11 @@ public class Invoice {
       invoiceDTo.setInvoiceStatus(this.getInvoiceStatus());
       invoiceDTo.setInvoiceNumber(this.getInvoiceNumber());
       invoiceDTo.setInvoiceItems(this.getInvoiceItems());
+      List<ItemDto> itemDtoList = new ArrayList<>();
+      for (InvoiceItem i: this.getInvoiceItems())
+         if (i.getItem() != null)
+            itemDtoList.add(new ItemDto(i.getItem()));
+      invoiceDTo.setItemDtoList(itemDtoList);
       CompanyDTO companyDTO =  new CompanyDTO(this.company);
       invoiceDTo.setCompanyDTO(companyDTO);
       return invoiceDTo;

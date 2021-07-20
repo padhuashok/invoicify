@@ -29,6 +29,7 @@ public class CompanyDTO {
     private String contactPhoneNumber;
 
     public CompanyDTO(Company company){
+        this.id = company.getId();
         this.address = company.getAddress();
         this.contactName = company.getContactName();
         this.contactTitle = company.getContactTitle();

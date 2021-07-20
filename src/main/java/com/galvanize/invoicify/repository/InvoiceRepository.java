@@ -2,6 +2,7 @@ package com.galvanize.invoicify.repository;
 
 import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.dto.InvoiceItemId;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -11,7 +12,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
+public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     @Query("Select max(i.invoiceNumber) from Invoice i")
     int getMaxInvoiceNumber();
 

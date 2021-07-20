@@ -17,8 +17,8 @@ import com.galvanize.invoicify.utils.RestUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,6 +92,13 @@ public class InvoicifyController {
             System.out.println(ex.getMessage());
             return RestUtils.buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), null);
         }
+    }
+
+    @GetMapping(value = "/invoices")
+    public ResponseEntity<List<InvoiceDTO>> getInvoices(@RequestParam(defaultValue = "0") int pageNum) throws ResourceNotFoundException {
+        if(invoiceService.getAllInvoicesByPageNum(pageNum).isEmpty())
+            throw new ResourceNotFoundException("No data available");
+        return new ResponseEntity<>(invoiceService.getAllInvoicesByPageNum(pageNum), HttpStatus.OK);
     }
     @PutMapping("/invoice/{invoiceNumber}")
     public ResponseEntity<InvoiceDTO> updateInvoice(@PathVariable int invoiceNumber, @RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {

@@ -4,11 +4,7 @@ import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.InvoiceItem;
 import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@ToString
-@EqualsAndHashCode
+@Data
 public class InvoiceItemId {
     private Long invoiceItemId;
     private Long itemId;
