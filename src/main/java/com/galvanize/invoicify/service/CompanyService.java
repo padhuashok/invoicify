@@ -2,11 +2,14 @@ package com.galvanize.invoicify.service;
 
 import com.galvanize.invoicify.domain.Company;
 import com.galvanize.invoicify.dto.CompanyDTO;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.CompanyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class CompanyService {
@@ -18,7 +21,21 @@ public class CompanyService {
         this.companyRepository = companyRepository;
     }
     public List<Company> getCompany(){
-        return (List<Company>) companyRepository.findAll();
+        Iterable<Company> companyList = companyRepository.findAll();
+        Iterator<Company> iterator = companyList.iterator();
+        // Iterator -> Spliterators -> Stream -> List
+        List<Company> result = StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false)
+                .collect(Collectors.toList());
+        return result;
+    }
+
+    public Company getCompanyById(Long companyId) throws ResourceNotFoundException {
+        Optional<Company> company = companyRepository.findById(companyId);
+        if(!company.isPresent()){
+            throw new ResourceNotFoundException("Company Not Found");
+        }
+        return company.get();
     }
 
     public Company save(CompanyDTO companyDTO) {
@@ -31,12 +48,12 @@ public class CompanyService {
         return companyRepository.save(company);
     }
 
-    public Company add(Company company) {return companyRepository.save(company);
+    public Company add(Company company) {
+        return companyRepository.save(company);
     }
 
-
-    public Company updateCompany(CompanyDTO companyDTO, Company companyEntity) {
-
+    public Company updateCompany(CompanyDTO companyDTO) {
+        Company companyEntity = companyRepository.findByName(companyDTO.getName()).get();
 
         companyEntity.setName(companyDTO.getName());
         companyEntity.setAddress(companyDTO.getAddress());
@@ -47,12 +64,4 @@ public class CompanyService {
         return companyRepository.save(companyEntity);
     }
 
-    public Company findByName(String name) {
-        return companyRepository.findByName(name).orElse(null);
-
-    }
-
-    public Company findById(long id) {
-        return companyRepository.findById(id).orElse(null);
-    }
 }

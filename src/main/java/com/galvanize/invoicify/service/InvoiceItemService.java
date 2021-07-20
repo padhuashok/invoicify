@@ -7,6 +7,7 @@ import com.galvanize.invoicify.repository.InvoiceItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,15 @@ public class InvoiceItemService {
             invoiceItems.add(invoiceItem);
                 }
         );
-
         return invoicItemRepository.saveAll(invoiceItems);
+    }
+
+    public void deleteExpiredAndPaidInv(List<Long> invoiceItemIds) {
+        invoicItemRepository.deleteAllById(invoiceItemIds);
+    }
+    public List<InvoiceItem> getInvoiceExpiredAndPaid() {
+        LocalDate endDate =  LocalDate.now().minusYears(1);
+        return invoicItemRepository.getInvoiceExpiredAndPaid(endDate);
+        //return invoicItemRepository.getInvoiceExpiredAndPaid();
     }
 }

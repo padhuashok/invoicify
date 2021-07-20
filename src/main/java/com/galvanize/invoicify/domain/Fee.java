@@ -6,11 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-@Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Fee {
     private double totalFee;
     @Id

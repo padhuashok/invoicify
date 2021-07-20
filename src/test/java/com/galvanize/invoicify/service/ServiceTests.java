@@ -1,20 +1,27 @@
 package com.galvanize.invoicify.service;
 
 import com.galvanize.invoicify.domain.*;
+import com.galvanize.invoicify.dto.InvoiceDTO;
+import com.galvanize.invoicify.dto.InvoiceItemId;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @WebMvcTest
@@ -26,7 +33,7 @@ public class ServiceTests {
     InvoiceService invoiceService;
 
     @MockBean
-    ItemService itemservice;
+    ItemService itemService;
 
     @MockBean
     InvoiceItemService invoiceItemService;
@@ -34,29 +41,46 @@ public class ServiceTests {
     @MockBean
     CompanyService companyService;
 
-    @Test
-    void addItemtoInvoice() throws Exception {
-        ItemDto itemdto1 = new ItemDto("Dev Items", 5, true, 2.3);
-        ItemDto itemdto2 = new ItemDto("Dev Items More", 2, false, 2.3, 10);
+    ItemDto itemdto1;
+    ItemDto itemdto2;
+    List<ItemDto> dtoitems;
+    Item item1;
+    Item item2;
+    List<Item> itemList;
+    Invoice invoice;
+    List<InvoiceItem> invoiceItemList;
+    InvoiceItem invoiceItem;
+    InvoiceItem invoiceItem2;
+    List<ItemDto> itemDtoList;
+
+    @BeforeEach
+    void setup() {
+        itemdto1 = new ItemDto("Dev Items", 1, true, 25);
+        itemdto2 = new ItemDto("Dev Items More", 2, false, 2.3);
         //create request to call api to create and check result
-        List<ItemDto> dtoitems = new ArrayList<>();
+        dtoitems = new ArrayList<>();
         dtoitems.add(itemdto1);
         dtoitems.add(itemdto2);
-        Item item1 = new Item(itemdto1);
-        Item item2 = new Item(itemdto2);
-        List<Item> itemList = Arrays.asList(item1, item2);
-        Invoice invoice = new Invoice();
+        item1 = new Item(itemdto1);
+        item2 = new Item(itemdto2);
+        itemList = Arrays.asList(item1, item2);
+        invoice = new Invoice();
         invoice.setId(1L);
         item1.setId(1L);
         item2.setId(2L);
-        List<InvoiceItem> invoiceItemList = new ArrayList<>();
-        InvoiceItem invoiceItem = new InvoiceItem(item1, invoice);
-        InvoiceItem invoiceItem2 = new InvoiceItem(item2, invoice);
+        invoiceItemList = new ArrayList<>();
+        invoiceItem = new InvoiceItem(item1, invoice);
+        invoiceItem2 = new InvoiceItem(item2, invoice);
         invoiceItemList.add(invoiceItem);
         invoiceItemList.add(invoiceItem2);
-        List<ItemDto> itemDtoList = Arrays.asList(itemdto1, itemdto2);
-        when(itemservice.saveItems(itemDtoList)).thenReturn(itemList);
-        List<Item> actualItems = itemservice.saveItems(itemDtoList);
+        itemDtoList = Arrays.asList(itemdto1, itemdto2);
+
+    }
+
+    @Test
+    void addItemtoInvoice() throws Exception {
+        when(itemService.saveItems(itemDtoList)).thenReturn(itemList);
+        List<Item> actualItems = itemService.saveItems(itemDtoList);
         assertEquals(itemList, actualItems);
         when(invoiceService.saveInvoice(invoice)).thenReturn(invoice);
         Invoice actualInvoice = invoiceService.saveInvoice(invoice);
@@ -65,5 +89,93 @@ public class ServiceTests {
         when(invoiceItemService.saveInvoiceItem(itemList, invoice)).thenReturn(invoiceItemList);
         List<InvoiceItem> actuals = invoiceItemService.saveInvoiceItem(itemList, invoice);
         assertEquals(invoiceItemList, actuals);
+    }
+
+    @Test
+    void createInvoiceAndUpdateCompany() throws Exception, ResourceNotFoundException {
+        Company c = new Company();
+        c.setId(1L);
+        c.setContactName("Hey There");
+        c.setName("My First Company");
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setInvoiceItems(invoiceItemList);
+        invoiceDTO.setCompanyId(1L);
+        double totalCost = 0.0;
+        for (InvoiceItem i :
+                invoiceItemList) {
+            totalCost += i.getItem().getTotalFee();
+        }
+        invoiceDTO.setInvoiceTotal(totalCost);
+        invoiceDTO.setInvoiceStatus("UNPAID");
+        invoiceDTO.setCreatedDate(LocalDate.now());
+        when(companyService.getCompanyById(1L)).thenReturn(c);
+        when(invoiceService.calculateTotalCostAndSetStatus(isA(InvoiceDTO.class), isA(Company.class)))
+                .thenReturn(invoiceDTO);
+        assertEquals(invoiceDTO, invoiceService.calculateTotalCostAndSetStatus(invoiceDTO, c));
+
+    }
+
+    @Test
+    public void deleteExpiredAndPaidInvoice() throws Exception {
+        List<Item> actualItems = itemService.saveItems(itemDtoList);
+        Invoice actualInvoice = invoiceService.saveInvoice(invoice);
+
+        List<InvoiceItem> invoiceItemList = invoiceItemService.saveInvoiceItem(itemList, invoice);
+        Company c = new Company();
+        c.setId(1L);
+        c.setContactName("Hey There");
+        c.setName("My First Company");
+        InvoiceDTO invoiceDTO = new InvoiceDTO();
+        invoiceDTO.setInvoiceItems(invoiceItemList);
+        invoiceDTO.setCompanyId(1L);
+        double totalCost = 0.0;
+        for (InvoiceItem i :
+                invoiceItemList) {
+            totalCost += i.getItem().getTotalFee();
+        }
+        invoiceDTO.setInvoiceTotal(totalCost);
+        invoiceDTO.setInvoiceStatus("UNPAID");
+        invoiceDTO.setCreatedDate(LocalDate.now());
+        Invoice invoice = new Invoice(invoiceDTO, c);
+        List<InvoiceItemId> invoiceItemIdList = new ArrayList<>();
+        invoiceItemList.forEach(invIt -> {
+            invoiceItemIdList.add(new InvoiceItemId(invIt.getId(), invIt.getItem().getId(), invIt.getInvoice().getId()));
+        });
+        invoice.setCreatedDate(LocalDate.now().minusYears(1));
+        invoice.setInvoiceStatus("PAID");
+        when(invoiceService.getInvoiceExpiredAndPaid()).thenReturn(invoiceItemIdList);
+
+        List<Long> invoiceItemIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceItemId()).collect(Collectors.toList());
+        List<Long> itemIds = invoiceItemIdList.stream().map(ex -> ex.getItemId()).collect(Collectors.toList());
+        List<Long> invoiceIds = invoiceItemIdList.stream().map(ex -> ex.getInvoiceId()).collect(Collectors.toList());
+        doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceItemIds);
+        doNothing().when(itemService).deleteByIds(itemIds);
+        doNothing().when(invoiceItemService).deleteExpiredAndPaidInv(invoiceIds);
+        invoiceItemService.deleteExpiredAndPaidInv(invoiceItemIds);
+        itemService.deleteByIds(itemIds);
+        invoiceService.deleteByIds(invoiceIds);
+    }
+
+    @Test
+    public void testSearchInvoiceByInvalidInvoiceNumber() throws ResourceNotFoundException {
+        int invoiceNumber = 1;
+        when(invoiceService.getInvoiceByInvoiceNumber(1)).thenThrow(new ResourceNotFoundException("Invoice number" + invoiceNumber + " not found"));
+        assertThrows(ResourceNotFoundException.class, () -> invoiceService.getInvoiceByInvoiceNumber(1));
+
+    }
+
+    @Test
+    public void testSearchInvoiceByInvoiceNumber() throws ResourceNotFoundException, Exception {
+        int invoiceNumber = 1;
+        Company c = new Company();
+        c.setId(1L);
+        c.setContactName("Hey There");
+        c.setName("My First Company");
+        invoice.setCompany(c);
+        invoice.setId(1L);
+        invoice.setInvoiceNumber(invoiceNumber);
+        when(invoiceService.getInvoiceByInvoiceNumber(invoiceNumber)).thenReturn(invoice);
+        Invoice actualInvoice = invoiceService.getInvoiceByInvoiceNumber(invoiceNumber);
+        assertEquals(invoice, actualInvoice);
     }
 }
