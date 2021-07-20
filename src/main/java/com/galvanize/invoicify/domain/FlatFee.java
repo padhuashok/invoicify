@@ -21,7 +21,9 @@ public class FlatFee extends Fee {
     public FlatFee(double amount) {
         this.amount = amount;
     }
+    @Override
     public double getTotalFee(  ){
+
         return amount;
     }
 
