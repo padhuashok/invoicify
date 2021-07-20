@@ -23,6 +23,6 @@ public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
     @Query("Select i from Invoice i where i.invoiceNumber=?1")
     Optional<Invoice> findByInvoiceNumber(int invoiceNumber);
 
-    @Query("Select i from Invoice i where i.invoiceNumber=?1 and i.invoiceStatus=UNPAID")
+    @Query("Select i from Invoice i where i.invoiceNumber=?1 and i.invoiceStatus='UNPAID'")
     Optional<Invoice> findUnpaidInvoiceByInvoiceNumber(int invoiceNumber);
 }
