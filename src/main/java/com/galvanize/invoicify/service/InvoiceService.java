@@ -85,7 +85,11 @@ public class InvoiceService {
         return  invoiceRepo.findByInvoiceNumber(invoiceNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice number"+ invoiceNumber+" not found"));
     }
-
+    public Invoice findUnpaidInvoiceByInvoiceNumber(int invoiceNumber) throws ResourceNotFoundException {
+        return invoiceRepo.findUnpaidInvoiceByInvoiceNumber(invoiceNumber)
+                .orElseThrow( () -> new ResourceNotFoundException("Cannot find UNPAID invoice with invoice number "+ invoiceNumber)
+                );
+    }
 }
 
 

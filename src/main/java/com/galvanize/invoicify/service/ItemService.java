@@ -1,9 +1,11 @@
 package com.galvanize.invoicify.service;
 
 import com.galvanize.invoicify.domain.FlatFee;
+import com.galvanize.invoicify.domain.Invoice;
 import com.galvanize.invoicify.domain.Item;
 import com.galvanize.invoicify.domain.RateFee;
 import com.galvanize.invoicify.dto.ItemDto;
+import com.galvanize.invoicify.exception.ResourceNotFoundException;
 import com.galvanize.invoicify.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,4 +32,8 @@ public class ItemService {
     public void deleteByIds(List<Long> itemIds) {
         itemRepository.deleteAllById(itemIds);
     }
+    public List<Item> updateItems(List<Item> items) {
+        return itemRepository.saveAll(items);
+    }
+
 }

@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,5 +93,21 @@ public class InvoicifyController {
             return RestUtils.buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), null);
         }
     }
-
+    @PutMapping("/invoice/{invoiceNumber}")
+    public ResponseEntity<InvoiceDTO> updateInvoice(@PathVariable int invoiceNumber, @RequestBody InvoiceDTO invoiceDTO) throws ResourceNotFoundException {
+        Company c = companyService.getCompanyById(invoiceDTO.getCompanyId());
+        Invoice invoiceDB = invoiceService.findUnpaidInvoiceByInvoiceNumber(invoiceNumber);
+        List<InvoiceItem> invoiceItems = invoiceDTO.getInvoiceItems();
+        if(!invoiceItems.isEmpty()){
+            invoiceDB.setModifiedDate(LocalDate.now());
+            invoiceService.saveInvoice(invoiceDB);
+            List<Item> items = invoiceItems.stream().map(invoiceItem  -> {
+                invoiceItem.setInvoice(invoiceDB);
+                return invoiceItem.getItem();
+            }).collect(Collectors.toList());
+            items = itemService.updateItems(items);
+            invoiceDTO = invoiceService.calculateTotalCostAndSetStatus(invoiceDTO, c);
+        }
+        return new ResponseEntity<>(invoiceDTO, HttpStatus.OK) ;
+    }
 }
